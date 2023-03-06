@@ -16,6 +16,9 @@ class AppFixtures extends Fixture
 
     )
     {
+        $product = new User();
+        $manager->persist($product);
+
     }
 
     public function load(ObjectManager $manager,): void
@@ -42,6 +45,7 @@ class AppFixtures extends Fixture
         $admin->setPassword($this->passwordHasher->hashPassword($admin,'password'));
         $admin->setRoles(['ROLE_ADMIN']);
         $manager->persist($admin);
+
 
         $manager->flush();
     }
