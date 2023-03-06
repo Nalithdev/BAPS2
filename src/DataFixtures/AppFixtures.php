@@ -16,8 +16,7 @@ class AppFixtures extends Fixture
 
     )
     {
-        $product = new User();
-        $manager->persist($product);
+
 
     }
 
