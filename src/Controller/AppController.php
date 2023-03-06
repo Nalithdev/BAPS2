@@ -20,7 +20,6 @@ class AppController extends AbstractController
     {
         $email = $request->request->get('email');
         $user = $userRepository->findOneBy(['email' => $email]);
-        $admin = $adminRepository->findOneBy(['email' => $email]);
         $trader = $traderRepository->findOneBy(['email' => $email]);
         $user1 = $userRepository->findOneBy(['email' => 'user1@example.com']);
 
@@ -29,21 +28,16 @@ class AppController extends AbstractController
         $session = $request->getSession();
         if ($user1) {
             $password = $request->request->get('password');
-
-            //dd($passwordHasher->isPasswordValid($user1, 'password'));
-            if ($user->getPassword() == $passwordHasher->isPasswordValid($user, $password)) {
-                $session->set('user', $user);
+            //dd($password);
+            //dd($passwordHasher->isPasswordValid($user1, $password));
+            if ($user1->getPassword() == $passwordHasher->isPasswordValid($user1, 'password')) {
+                $session->set('user', $user1->getEmail());
                 $this->addFlash('success', 'Vous êtes connecté');
-                return $this->json(['success' => true, 'message' => 'Vous êtes connecté']);
+                return  new JsonResponse(['success' => true, 'message' => 'Vous etes connecte' , $session->get('user')]);
             }
 
-        } elseif ($admin) {
-            if ($admin->getPassword() == $request->request->get('password')) {
-                $session->set('admin', $admin);
-                $this->addFlash('success', 'Vous êtes connecté');
-                return $this->redirectToRoute('admin_index');
-            }
-        } elseif ($trader) {
+        }
+        elseif ($trader) {
             if ($trader->getPassword() == $request->request->get('password')) {
                 $session->set('trader', $trader);
                 $this->addFlash('success', 'Vous êtes connecté');
@@ -51,5 +45,12 @@ class AppController extends AbstractController
             }
         }
         return $this->json(['success' => false, 'message' => 'Identifiants incorrects']);
+    }
+    #[Route('/', name: 'app_index')]
+    public function index(): Response
+    {
+        return $this->render('app/index.html.twig', [
+            'controller_name' => 'AppController',
+        ]);
     }
 }
