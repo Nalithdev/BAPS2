@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello Admin{% endblock %}
+
+{% block body %}
+
+    <div class="example-wrapper">
+        <h1>Hello Admin ! ✅</h1>
+
+        {% for ask in asks %}
+            <p>{{ asks.name }}</p>
+            <p>{{ asks.email }}</p>
+            <p>{{ asks.siren }}</p>
+            <form method="post" action="{{ path('app_register_trad') }}">
+                <input type="hidden" name="id" value="{{ ask.id }}">
+                <input type="hidden" name="name" value="{{ ask.name }}">
+                <button type="submit" name="action" value="accept">Accepter</button>
+                <button type="submit" name="action" value="refuse">Refuser</button>
+            </form>
+        {% endfor %}
+    </div>
+{% endblock %}
