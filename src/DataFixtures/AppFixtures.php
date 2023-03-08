@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\Admin;
+use App\Entity\Ask;
 use App\Entity\Trader;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -17,7 +18,6 @@ class AppFixtures extends Fixture
     )
     {
 
-
     }
 
     public function load(ObjectManager $manager,): void
@@ -30,22 +30,34 @@ class AppFixtures extends Fixture
             $user->setPassword($this->passwordHasher->hashPassword($user,'password'));
             $manager->persist($user);
 
-            $trader = new Trader();
-            $trader->setEmail('trader' . $i . '@example.com');
-            $trader->setName('FIRSTNAME' . $i);
-            $trader->setPassword($this->passwordHasher->hashPassword($trader,'password'));
-            $manager->persist($trader);
+
 
         }
 
 
+
+
+
+
+
+        for ($i = 1; $i <= 50; $i++) {
+
+
+            $ask = new Ask();
+            $ask->setEmail('traders' . $i . '@example.com');
+            $ask->setName('FIRSTNAME' . $i);
+            $ask->setPassword($this->passwordHasher->hashPassword($ask,'password'));
+            $ask->setSiren('123456789');
+            $manager->persist($ask);
+
+        }
+        $manager->flush();
         $admin = new Admin();
         $admin->setEmail('Antony@gmail.com');
-        $admin->setPassword($this->passwordHasher->hashPassword($admin,'password'));
         $admin->setRoles(['ROLE_ADMIN']);
+        $admin->setPassword($this->passwordHasher->hashPassword($admin,'password'));
         $manager->persist($admin);
-
-
-        $manager->flush();
     }
+
+    
 }
