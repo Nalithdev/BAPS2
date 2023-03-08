@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\User ;
-use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,11 +11,11 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 class AuthController extends AbstractController
 {
-    #[Route('/auth1', name: 'app_auth1', methods: ['POST'])]
+    #[Route('/auth1', name: 'app_auth1', methods: ['GET','POST'])]
     public function auth(Request $request, User $userRepository, $id ): Response
     {
         // Je crée une instance User dans laquelle je lui demande de chercher les id des utilisateurs
-        $users = $userRepository->findby($id);
+        $users = $userRepository->find($id);
 
 
         // générer le token
