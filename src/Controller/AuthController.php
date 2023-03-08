@@ -13,7 +13,7 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 class AuthController extends AbstractController
 {
     #[Route('/auth1', name: 'app_auth1', methods: ['POST'])]
-    public function auth(Request $request, UserRepository $userRepository ): Response
+    public function auth(Request $request, User $userRepository ): Response
     {
         // Je crée une instance User dans laquelle je lui demande de chercher les id des utilisateurs
         $users = $userRepository->findAll();
