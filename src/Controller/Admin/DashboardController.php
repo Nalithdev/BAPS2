@@ -11,6 +11,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -20,6 +21,48 @@ class DashboardController extends AbstractDashboardController
 	 * @throws ContainerExceptionInterface
 	 * @throws NotFoundExceptionInterface
 	 */
+    #[Route('/admin', name: 'ask')]
+    public function asking(UserRepository $userRepository): Response
+    {
+
+        $admin = $this->getUser();
+        if ($admin){
+            if ($admin->getRoles()[0] == 'ROLE_ADMIN') {
+                $asks = $userRepository->findBy(
+                    [
+                        'approved'=> '0',
+
+                        ] );
+
+                return $this->render('admin/asking.html.twig', [
+                    'admin' => $admin,
+                    'asks' => $asks,
+                ]);
+            }
+        }
+        return $this->redirectToRoute('app_login');
+
+    }
+    #[Route('/registertrad', name: 'app_register_trad')]
+    public function registertrad( Request $request, \Doctrine\Persistence\ManagerRegistry $managerRegistry, UserRepository $userRepository): Response
+    {
+        if ($request->get('action') == 'accept') {
+            $id = $request->get('id');
+            $user = $userRepository->findOneBy(['id' => $id]);
+
+            $user->setApproved(true);
+            $managerRegistry->getManager()->persist($user);
+
+        } elseif ($request->get('action') == 'refuse') {
+            $id = $request->get('id');
+            $user = $userRepository->findOneBy('id', $id);
+            $managerRegistry->getManager()->remove($user);
+
+        }
+        $managerRegistry->getManager()->flush();
+        return $this->redirectToRoute('ask');
+    }
+
 	#[Route('/admin/advanced', name: 'admin')]
     public function index(): Response
     {
