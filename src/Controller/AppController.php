@@ -59,7 +59,7 @@ class AppController extends AbstractController
         $Nuser->setEmail($email);
         $Nuser->setPassword($passwordHasher->hashPassword($Nuser ,$password));
         if ($action == 'shop'){
-            $Nuser->setRoles(['ROLE_SHOP']);
+            $Nuser->setRoles(['ROLE_MERCHANT']);
             $Nuser->setSiren($request->request->get('siren'));
             $Nuser->setApproved(false);
         }

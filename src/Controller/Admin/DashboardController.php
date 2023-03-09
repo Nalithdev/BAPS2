@@ -55,7 +55,7 @@ class DashboardController extends AbstractDashboardController
 
         } elseif ($request->get('action') == 'refuse') {
             $id = $request->get('id');
-            $user = $userRepository->findOneBy('id', $id);
+            $user = $userRepository->findOneBy(['id'=> $id]);
             $managerRegistry->getManager()->remove($user);
 
         }
