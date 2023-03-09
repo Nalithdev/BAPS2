@@ -9,6 +9,7 @@ security:
             entity:
                 class: App\Entity\User
                 property: email
+
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
@@ -17,6 +18,7 @@ security:
             lazy: true
             provider: app_user_provider
             custom_authenticator: App\Security\AdminAuthenticator
+            security: true
             logout:
                 path: app_logout
                 # where to redirect after logout
@@ -46,3 +48,11 @@ when@test:
                 cost: 4 # Lowest possible value for bcrypt
                 time_cost: 3 # Lowest possible value for argon
                 memory_cost: 10 # Lowest possible value for argon
+
+    providers:
+        in_memory:
+            memory:
+                users:
+                    username:
+                        password: password
+                        roles: ROLE_USER
