@@ -2,31 +2,32 @@
 
 namespace App\Controller;
 
-use App\Entity\User ;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\MakerBundle\Tests\tmp\current_project_xml\src\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class AuthController extends AbstractController
 {
     #[Route('/auth1', name: 'app_auth1', methods: ['GET','POST'])]
-    public function auth(Request $request, User $userRepository, $id ): Response
+    public function auth(Request $request, UserRepository $userRepository , $id): Response
     {
-        // Je crée une instance User dans laquelle je lui demande de chercher les id des utilisateurs
-        $users = $userRepository->find($id);
+        // Je vais créer une instance User dans laquelle je lui demande de chercher les id des utilisateurs
+        $users = $userRepository->findBy($id);
 
 
-        // générer le token
-        $token = new UsernamePasswordToken($users, null, $users->getRoles());
+
+        // Je génère le token
+        $token = new UsernamePasswordToken($users, 'main', $users->getRoles());
 
 
         // stocker le jeton généré dans la session
         $session = $request->getSession();
-        if ($session) {
-            $session->set('_security_main', serialize($token));
-        }
+        $session->set('_security_main', serialize($token));
+
 
         // retourner le token
         return $this->json(['token' => $token]);
