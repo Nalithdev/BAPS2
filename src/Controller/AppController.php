@@ -31,7 +31,7 @@ class AppController extends AbstractController
     public function auth(Request $request, UserRepository $userRepository,UserPasswordHasherInterface $passwordHasher ): Response
     {
         $email = $request->request->get('email');
-        $email = "francisbertrand@gmail.com";
+        //$email = "francisbertrand@gmail.com";
         $user = $userRepository->findOneBy(['email' => $email]);
         //$user1 = $userRepository->findOneBy(['email' => 'user1@example.com']);
 
@@ -40,7 +40,7 @@ class AppController extends AbstractController
         $session = $request->getSession();
         if ($user) {
             $password = $request->request->get('password');
-            $password ="password";
+            //$password ="password";
             if ($user->getPassword() == $passwordHasher->isPasswordValid($user, $password)) {
                 $session->set('user', $user->getEmail());
                 $this->addFlash('success', 'Vous êtes connecté');
@@ -138,10 +138,13 @@ class AppController extends AbstractController
         if (!$title && !$description) {
             return $this->json(['success' => false , 'message' => 'Veuillez remplir tous les champs']);
         }
+        $dates =  date('Y-m-d H:i:s');
+;
         $feed = new Feed();
         $feed->setTitle($title);
         $feed->setDescription($description);
         $feed->setUser($id);
+        $feed->setCDate(strval($dates));
 
         $managerRegistry->getManager()->persist($feed);
         $managerRegistry->getManager()->flush();
@@ -151,21 +154,34 @@ class AppController extends AbstractController
     }
 
     #[Route('/feed', name:'app_Feed')]
-    public function Feed(FeedRepository $feedRepository): JsonResponse
+    public function Feed(FeedRepository $feedRepository , UserRepository $userRepository): JsonResponse
     {
         $feed = $feedRepository->findAll();
-        $title = [];
-        $description = [];
+        $Tlfeed =  array();
+        $Tfeed = array();
+
+        $x = 0;
 
         foreach ( $feed as $f){
-            $title[] = $f->getTitle();
-            $description[] = $f->getDescription();
+            $user = $userRepository->findOneBy(['id' => $f->getUser()]);
+            $Tlfeed['id'] = $user->getId();
+            $Tlfeed['title'] = $f->getTitle();
+            $Tlfeed['Description'] = $f->getDescription();
+            $Tlfeed['Date'] = $f->getCDate();
+            $Tlfeed['FN'] = $user->getFirstname();
+            $Tlfeed['LN'] = $user->getLastname();
+
+
+            array_push($Tfeed,  $Tlfeed);
+
+
+
         }
 
        /* $myfeed->SetTitles("bonjour");
         $myfeed->SetDescriptions($description);*/
 
-        return $this->json(['success' => true , 'message' => 'Feed envoyer', 'titre' => $title , 'description' => $description] );
+        return $this->json(['success' => true , 'message' => 'Feed envoyer', 'Feed' => $Tfeed ]);
     }
 
     #[Route('/check', name:'app_check' , methods: ['POST', 'GET'])]
