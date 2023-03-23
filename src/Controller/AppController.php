@@ -4,9 +4,11 @@ namespace App\Controller;
 
 
 use App\Entity\Feed;
+use App\Entity\Token;
 use App\Entity\User;
 use App\Controller\Senderfeed;
 use App\Repository\FeedRepository;
+use App\Repository\TokenRepository;
 use App\Repository\UserRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,7 +20,9 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-
+use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
 
 
 class AppController extends AbstractController
@@ -101,20 +105,26 @@ class AppController extends AbstractController
 
     }
     #[Route('/auth1/{id}', name: 'app_auth1')]
-    public function auth1(Request $request, UserRepository $userRepository, $id, TokenStorageInterface $tokenStorage ): JsonResponse
+    public function auth1(Request $request, UserRepository $userRepository, $id, ManagerRegistry $managerRegistry, TokenGeneratorInterface $tokenGenerator ): JsonResponse
     {
         // Je crée une instance User dans laquelle je lui demande de chercher les id des utilisateurs
         $fuser = $userRepository->findOneBy(['id' => $id]);
         $role = $fuser->getRoles();
+        $Stoken = $tokenGenerator->generateToken();
 
-        // générer le token
-        $token = new UsernamePasswordToken( $fuser, 'main', $role);
+        $date = time();
+        $Ntoken = new Token();
+        $Ntoken->setTokenId($Stoken);
+        $Ntoken->setUserId($id);
+        $Ntoken->setCreateDate($date);
+        $managerRegistry->getManager()->persist($Ntoken);
+        $managerRegistry->getManager()->flush();
 
         //recuperer le token dans le storage
-        $tokenStorage->setToken($token);
 
 
-        return $this->json  (['token' => serialize($token), 'id' => $id, 'role' => $role[0]]);
+
+        return $this->json  (['token' => $Stoken , 'id' => $id, 'role' => $role[0]]);
 
     }
 
@@ -144,29 +154,40 @@ class AppController extends AbstractController
     public function Feed(FeedRepository $feedRepository): JsonResponse
     {
         $feed = $feedRepository->findAll();
-        $myfeed = new Senderfeed();
-        dd($myfeed);
-        $myfeed->SetTitles("bonjour");
-        $myfeed->SetDescriptions($description);
+        $title = [];
+        $description = [];
 
-        return $this->json($feed);
+        foreach ( $feed as $f){
+            $title[] = $f->getTitle();
+            $description[] = $f->getDescription();
+        }
+
+       /* $myfeed->SetTitles("bonjour");
+        $myfeed->SetDescriptions($description);*/
+
+        return $this->json(['success' => true , 'message' => 'Feed envoyer', 'titre' => $title , 'description' => $description] );
     }
 
     #[Route('/check', name:'app_check' , methods: ['POST', 'GET'])]
-    public function check(Request $request , TokenStorageInterface $tokenStorage, SessionInterface $session): JsonResponse
+    public function check(Request $request , TokenRepository $tokenRepository, ManagerRegistry $managerRegistry): JsonResponse
     {
-        $token = "";
-        $rtoken =$tokenStorage->getToken();
-        $rtoken = serialize($rtoken);
-        dd($rtoken, $token);
-        if ($token == $rtoken) {
-            return $this->json(['success' => true, 'message' => 'Vous etes connecté']);
+        $token = $request->request->get('token');
+        $tokens= "bCYLQwKclswfzm1PqmPl44i1_ux-rc2h5PMXBWuIQyY";
+        $Mytoken = $tokenRepository->findOneBy(['token_id' => $token]);
+        $date = time();
+        $day = ($date - $Mytoken->getCreateDate())/86400;
+        if ($day < 7){
+            return $this->json(['success' => true , 'message' => 'Token valide, donc connecition autorisé']);
         }
         else{
-            return $this->json(['success' => false, 'message' => 'Vous n\'etes pas connecté']);
+            $managerRegistry->getManager()->remove($Mytoken);
+            return $this->json(['success' => false , 'message' => 'Token invalide, donc connecition non autorisé']);
         }
 
+
+
     }
+
 
 
 }
