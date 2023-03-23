@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -42,6 +44,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\OneToOne(inversedBy: 'owner', cascade: ['persist', 'remove'])]
     private ?Commerce $commerce = null;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Feed::class)]
+    private Collection $feeds;
+
+    public function __construct()
+    {
+        $this->feeds = new ArrayCollection();
+    }
+
+    
 
     public function getId(): ?int
     {
@@ -172,4 +184,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, Feed>
+     */
+    public function getFeeds(): Collection
+    {
+        return $this->feeds;
+    }
+
+    public function addFeed(Feed $feed): self
+    {
+        if (!$this->feeds->contains($feed)) {
+            $this->feeds->add($feed);
+            $feed->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFeed(Feed $feed): self
+    {
+        if ($this->feeds->removeElement($feed)) {
+            // set the owning side to null (unless already changed)
+            if ($feed->getUser() === $this) {
+                $feed->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+
 }

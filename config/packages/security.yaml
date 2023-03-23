@@ -49,10 +49,3 @@ when@test:
                 time_cost: 3 # Lowest possible value for argon
                 memory_cost: 10 # Lowest possible value for argon
 
-    providers:
-        in_memory:
-            memory:
-                users:
-                    username:
-                        password: password
-                        roles: ROLE_USER

@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\CommerceRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CommerceRepository::class)]
@@ -21,6 +23,14 @@ class Commerce
 
     #[ORM\OneToOne(mappedBy: 'commerce', cascade: ['persist', 'remove'])]
     private ?User $owner = null;
+
+    #[ORM\OneToMany(mappedBy: 'id_commerce', targetEntity: Feed::class)]
+    private Collection $feeds;
+
+    public function __construct()
+    {
+        $this->feeds = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -72,4 +82,7 @@ class Commerce
 
         return $this;
     }
+
+
+
 }

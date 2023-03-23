@@ -2,26 +2,32 @@
 
 namespace App\Controller;
 
+
+use App\Entity\Feed;
 use App\Entity\User;
+use App\Controller\Senderfeed;
+use App\Repository\FeedRepository;
 use App\Repository\UserRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
-use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
-use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
-use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+
+
 
 class AppController extends AbstractController
 {
     #[Route('/auth', name:'app_auth', methods: ['POST', 'GET'])]
-    public function auth(Request $request, UserRepository $userRepository,UserPasswordHasherInterface $passwordHasher): JsonResponse
+    public function auth(Request $request, UserRepository $userRepository,UserPasswordHasherInterface $passwordHasher ): Response
     {
         $email = $request->request->get('email');
+        $email = "francisbertrand@gmail.com";
         $user = $userRepository->findOneBy(['email' => $email]);
         //$user1 = $userRepository->findOneBy(['email' => 'user1@example.com']);
 
@@ -30,12 +36,13 @@ class AppController extends AbstractController
         $session = $request->getSession();
         if ($user) {
             $password = $request->request->get('password');
+            $password ="password";
             if ($user->getPassword() == $passwordHasher->isPasswordValid($user, $password)) {
                 $session->set('user', $user->getEmail());
                 $this->addFlash('success', 'Vous êtes connecté');
-                $this->redirectToRoute('app_auth1' , [ 'id' => $user->getId()]);
-                $role = $user->getRoles();
-                return  new JsonResponse(['success' => true, 'message' => 'Vous etes connecte' , $session->get('user')]);
+                return $this->redirectToRoute('app_auth1' , [ 'id' => $user->getId()]);
+
+                //new JsonResponse(['success' => true, 'message' => 'Vous etes connecte' , $session->get('user')]);
 
             }
 
@@ -52,7 +59,7 @@ class AppController extends AbstractController
 
     }
     #[Route('/register', name: 'app_register')]
-    public function register(Request $request, \Doctrine\Persistence\ManagerRegistry $managerRegistry, UserRepository $userRepository, UserPasswordHasherInterface $passwordHasher): Response
+    public function register(Request $request, ManagerRegistry $managerRegistry, UserPasswordHasherInterface $passwordHasher): Response
     {
 
 
@@ -84,9 +91,9 @@ class AppController extends AbstractController
             $managerRegistry->getManager()->flush();
             return  new JsonResponse(['success' => true, 'message' => 'Vous etes inscrit']);
         }
-            else{
-                return new JsonResponse(['success' => false, 'message' => 'Vous devez renseigner tous les champs']);
-            }
+        else{
+            return new JsonResponse(['success' => false, 'message' => 'Vous devez renseigner tous les champs']);
+        }
 
 
 
@@ -94,35 +101,72 @@ class AppController extends AbstractController
 
     }
     #[Route('/auth1/{id}', name: 'app_auth1')]
-    public function auth1(Request $request, UserRepository $userRepository, $id ): JsonResponse
+    public function auth1(Request $request, UserRepository $userRepository, $id, TokenStorageInterface $tokenStorage ): JsonResponse
     {
         // Je crée une instance User dans laquelle je lui demande de chercher les id des utilisateurs
         $fuser = $userRepository->findOneBy(['id' => $id]);
         $role = $fuser->getRoles();
-        $email = $fuser->getEmail();
-        $password = $fuser->getPassword();
-        $all = [$email, $password , $role];
 
         // générer le token
         $token = new UsernamePasswordToken( $fuser, 'main', $role);
 
+        //recuperer le token dans le storage
+        $tokenStorage->setToken($token);
 
 
-        // stocker le jeton généré dans la session
-        $session = $request->getSession();
+        return $this->json  (['token' => serialize($token), 'id' => $id, 'role' => $role[0]]);
+
+    }
+
+    #[Route('/SFeed', name:'app_SFeed', methods: ['POST', 'GET'])]
+    public function SendFeed(Request $request,  ManagerRegistry $managerRegistry): Response
+    {
+        $title = $request->request->get('title');
+        $description = $request->request->get('description');
+        $id = $request->request->get('id');
+
+        if (!$title && !$description) {
+            return $this->json(['success' => false , 'message' => 'Veuillez remplir tous les champs']);
+        }
+        $feed = new Feed();
+        $feed->setTitle($title);
+        $feed->setDescription($description);
+        $feed->setUser($id);
+
+        $managerRegistry->getManager()->persist($feed);
+        $managerRegistry->getManager()->flush();
 
 
-            $session->set('_security_name', $token);
+        return $this->json(['success' => true , 'message' => 'Feed envoyer']);
+    }
 
-            dd($session , $token);
-        // retourner le token
-        return new JsonResponse(['token' => $session->get('_security_name'), 'success' => true, 'message' => 'Vous etes connecte']);
+    #[Route('/feed', name:'app_Feed')]
+    public function Feed(FeedRepository $feedRepository): JsonResponse
+    {
+        $feed = $feedRepository->findAll();
+        $myfeed = new Senderfeed();
+        dd($myfeed);
+        $myfeed->SetTitles("bonjour");
+        $myfeed->SetDescriptions($description);
+
+        return $this->json($feed);
+    }
+
+    #[Route('/check', name:'app_check' , methods: ['POST', 'GET'])]
+    public function check(Request $request , TokenStorageInterface $tokenStorage, SessionInterface $session): JsonResponse
+    {
+        $token = "";
+        $rtoken =$tokenStorage->getToken();
+        $rtoken = serialize($rtoken);
+        dd($rtoken, $token);
+        if ($token == $rtoken) {
+            return $this->json(['success' => true, 'message' => 'Vous etes connecté']);
+        }
+        else{
+            return $this->json(['success' => false, 'message' => 'Vous n\'etes pas connecté']);
+        }
 
     }
 
 
-
-
-
-
-    }
+}
