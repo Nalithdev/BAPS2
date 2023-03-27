@@ -7,23 +7,19 @@ use App\Entity\Feed;
 use App\Entity\Product;
 use App\Entity\Token;
 use App\Entity\User;
-use App\Controller\Senderfeed;
 use App\Repository\FeedRepository;
 use App\Repository\ProductRepository;
 use App\Repository\TokenRepository;
 use App\Repository\UserRepository;
+use App\Security\TokenAuthenticator;
 use Doctrine\Persistence\ManagerRegistry;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Csrf\CsrfToken;
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
 
 
@@ -131,7 +127,7 @@ class AppController extends AbstractController
 
     }
 
-    #[Route('/SFeed', name:'app_SFeed', methods: ['POST', 'GET'])]
+    #[Route('/feed/send', name:'app_SFeed', methods: ['POST'])]
     public function SendFeed(Request $request,  ManagerRegistry $managerRegistry): Response
     {
         $title = $request->request->get('title');
@@ -155,10 +151,12 @@ class AppController extends AbstractController
 
         return $this->json(['success' => true , 'message' => 'Feed envoyer']);
     }
-
-    #[Route('/feed', name:'app_Feed')]
-    public function Feed(FeedRepository $feedRepository , UserRepository $userRepository): JsonResponse
+	
+	
+	#[Route('/feed', name:'app_Feed')]
+    public function Feed(Request $request, FeedRepository $feedRepository , UserRepository $userRepository, TokenAuthenticator $tokenAuthenticator): JsonResponse
     {
+		
         $feed = $feedRepository->findAll();
 
         $Tfeed = array();
@@ -169,6 +167,7 @@ class AppController extends AbstractController
 
         foreach ( $feed as $f){
             $user = $userRepository->findOneBy(['id' => $f->getUser()]);
+
             $Tmessage['message']['id'] = $f->getId();
             $Tmessage['message']['title'] = $f->getTitle();
             $Tmessage['message']['Description'] = $f->getDescription();
@@ -184,36 +183,12 @@ class AppController extends AbstractController
 
             array_push($Tfeed,  $Tmessage);
 
-
-
         }
-
-       /* $myfeed->SetTitles("bonjour");
-        $myfeed->SetDescriptions($description);*/
 
         return $this->json(['success' => true , 'message' => 'Feed envoyer', 'Feed' => $Tfeed ]);
     }
 
-    #[Route('/check', name:'app_check' , methods: ['POST'])]
-    public function check(Request $request , TokenRepository $tokenRepository, ManagerRegistry $managerRegistry): JsonResponse
-    {
-        $token = $request->request->get('token');
-        $Mytoken = $tokenRepository->findOneBy(['token_id' => $token]);
-        $date = time();
-        $day = ($date - $Mytoken->getCreateDate())/86400;
-        if ($day < 7){
-            return $this->json(['success' => true , 'message' => 'Token valide, donc connecition autorisé']);
-        }
-        else{
-            $managerRegistry->getManager()->remove($Mytoken);
-            return $this->json(['success' => false , 'message' => 'Token invalide, donc connecition non autorisé']);
-        }
 
-
-
-
-
-    }
 
     #[Route('/products', name:'app_product' , methods: ['POST', 'GET'])]
     public function product(ManagerRegistry $managerRegistry): Response
