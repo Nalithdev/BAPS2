@@ -215,19 +215,22 @@ class AppController extends AbstractController
 
     }
 
-    #[Route('/product', name:'app_product' , methods: ['POST', 'GET'])]
-    public function product(ProductRepository $productRepository): JsonResponse
+    #[Route('/products', name:'app_product' , methods: ['POST', 'GET'])]
+    public function product(ManagerRegistry $managerRegistry): Response
     {
+
         $product = new Product();
         $product->setName('name');
         $product->setDescription('description');
         $product->setPrice(rand(1, 100));
         $product->setStock(rand(1, 100));
+        $managerRegistry->getManager()->persist($product);
+        $managerRegistry->getManager()->flush();
+        return $this->json(['success' => true , 'message' => 'Produit envoyer', 'produit' => $product] );
 
-
-        return $this->json(['success' => true , 'message' => 'Produit envoyer', 'produit' => $productRepository->findAll()] );
 
 
     }
+
 
 }
