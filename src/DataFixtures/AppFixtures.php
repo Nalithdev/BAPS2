@@ -2,6 +2,8 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Commerce;
+use App\Entity\Product;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -28,7 +30,7 @@ class AppFixtures extends Fixture
 		
 		$manager->flush();
 		
-		//Créons un admin
+		//Création d'un admin
 		$admin = new User();
 		$admin->setEmail('admin@antony.com');
 		$admin->setPassword($this->passwordHasher->hashPassword($admin, 'password'));
@@ -41,7 +43,7 @@ class AppFixtures extends Fixture
 		
 		$manager->flush();
 		
-		//Créons un commerçant
+		//Création d'un commerçant
 		
 		$merchant = new User();
 		$merchant->setEmail('philippe.lafont@gmail.com');
@@ -56,6 +58,44 @@ class AppFixtures extends Fixture
 		$manager->persist($merchant);
 		
 		$manager->flush();
-		
+
+
+        //Création d'un commerce
+
+        $user = $manager->getRepository(User::class)->findAll();
+
+        foreach($user as $s){
+
+            $shop= new Commerce();
+            $shop->setName($s->getFirstname() . ' ' . $s->getLastname());
+            $shop->setDescription('description du commerce');
+            $manager->persist($shop);
+
+        }
+        $manager->flush();
+
+        //Création d'un produits
+
+        // 1 - Appel d'un shop
+
+        $shopRepository = $manager->getRepository(Commerce::class);
+        $shop = $shopRepository->findAll();
+
+        // 2 - Création de 10 produits
+
+        for($i = 1; $i <= 30; $i++){
+            $product = new Product();
+            $product->setName('Produit ' . $i);
+            $product->setDescription('Description du produit ' . $i);
+            $product->setPrice(10);
+            $product->setStock(10);
+            $product->setShop($shop[rand(0, count($shop) - 1)]);
+            $manager->persist($product);
+        }
+
+        $manager->flush();
+
+
+
     }
 }

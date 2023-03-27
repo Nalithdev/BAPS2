@@ -27,9 +27,13 @@ class Commerce
     #[ORM\OneToMany(mappedBy: 'id_commerce', targetEntity: Feed::class)]
     private Collection $feeds;
 
+    #[ORM\OneToMany(mappedBy: 'shop', targetEntity: Product::class)]
+    private Collection $products;
+
     public function __construct()
     {
         $this->feeds = new ArrayCollection();
+        $this->products = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -79,6 +83,36 @@ class Commerce
         }
 
         $this->owner = $owner;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Product>
+     */
+    public function getProducts(): Collection
+    {
+        return $this->products;
+    }
+
+    public function addProduct(Product $product): self
+    {
+        if (!$this->products->contains($product)) {
+            $this->products->add($product);
+            $product->setShop($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProduct(Product $product): self
+    {
+        if ($this->products->removeElement($product)) {
+            // set the owning side to null (unless already changed)
+            if ($product->getShop() === $this) {
+                $product->setShop(null);
+            }
+        }
 
         return $this;
     }

@@ -4,10 +4,12 @@ namespace App\Controller;
 
 
 use App\Entity\Feed;
+use App\Entity\Product;
 use App\Entity\Token;
 use App\Entity\User;
 use App\Controller\Senderfeed;
 use App\Repository\FeedRepository;
+use App\Repository\ProductRepository;
 use App\Repository\TokenRepository;
 use App\Repository\UserRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -186,8 +188,23 @@ class AppController extends AbstractController
 
 
 
+
+
     }
 
+    #[Route('/product', name:'app_product' , methods: ['POST', 'GET'])]
+    public function product(ProductRepository $productRepository): JsonResponse
+    {
+        $product = new Product();
+        $product->setName('name');
+        $product->setDescription('description');
+        $product->setPrice(rand(1, 100));
+        $product->setStock(rand(1, 100));
 
+
+        return $this->json(['success' => true , 'message' => 'Produit envoyer', 'produit' => $productRepository->findAll()] );
+
+
+    }
 
 }
