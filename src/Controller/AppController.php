@@ -204,7 +204,12 @@ class AppController extends AbstractController
         return $this->json(['success' => true , 'message' => 'Produit envoyer', 'produit' => $product] );
 
 
+    }
 
+    #[Route('/{id}', name: 'app_product_id', methods: ['GET'])]
+    public function show(Product $product): Response
+    {
+        return $this->json(['success' => true , 'message' => 'Produit envoyer', 'produit' => $product] );
     }
 
 
