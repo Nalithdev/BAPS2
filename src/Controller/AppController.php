@@ -155,12 +155,7 @@ class AppController extends AbstractController
 	#[Route('/feed', name:'app_Feed')]
     public function Feed(Request $request, FeedRepository $feedRepository , UserRepository $userRepository, TokenAuthenticator $tokenAuthenticator): JsonResponse
     {
-		$token = $request->headers->get('Token');
-		if(!$token) {
-			return $this->json($tokenAuthenticator::$JSON_ERROR);
-		}
-		
-		if(!$tokenAuthenticator->getUser($token)) return $this->json($tokenAuthenticator::$JSON_ERROR);
+		if(!$tokenAuthenticator->getUser($request)) return $this->json($tokenAuthenticator::$JSON_ERROR);
 		
         $feed = $feedRepository->findAll();
         $Tlfeed =  array();

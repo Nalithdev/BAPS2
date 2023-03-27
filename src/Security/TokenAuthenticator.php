@@ -5,6 +5,7 @@ use App\Entity\User;
 use App\Repository\TokenRepository;
 use App\Repository\UserRepository;
 use Exception;
+use Symfony\Component\HttpFoundation\Request;
 
 class TokenAuthenticator
 {
@@ -22,8 +23,11 @@ class TokenAuthenticator
 	/**
 	 * @throws Exception
 	 */
-	public function getUser($token): ?User
+	public function getUser(Request $request): ?User
 	{
+		$token = $request->headers->get('Token');
+		if(!$token) return null;
+		
 		$result = $this->tokenRepository->findOneBy(['token_id' => $token]);
 		
 		if ($result) {

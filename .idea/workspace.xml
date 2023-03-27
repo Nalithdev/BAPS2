@@ -4,21 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="04501c98-86f6-40b3-8c49-8bc3b4b250b5" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/migrations/Version20230327081210.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Security/TokenAuthenticator.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/Version20230321150158.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/Version20230321150247.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/Version20230323103746.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/Version20230323103848.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/Version20230323133157.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Controller/AppController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/AppController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Controller/Senderfeed.php" beforeDir="false" />
-    </list>
+    <list default="true" id="04501c98-86f6-40b3-8c49-8bc3b4b250b5" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -165,7 +151,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1679904496243</updated>
-      <workItem from="1679904497293" duration="1765000" />
+      <workItem from="1679904497293" duration="2096000" />
     </task>
     <servers />
   </component>
