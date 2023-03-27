@@ -149,13 +149,10 @@ class AppController extends AbstractController
         return $this->json(['success' => true , 'message' => 'Feed envoyer']);
     }
 	
-	/**
-	 * @throws Exception
-	 */
+	
 	#[Route('/feed', name:'app_Feed')]
     public function Feed(Request $request, FeedRepository $feedRepository , UserRepository $userRepository, TokenAuthenticator $tokenAuthenticator): JsonResponse
     {
-		if(!$tokenAuthenticator->getUser($request)) return $this->json($tokenAuthenticator::$JSON_ERROR);
 		
         $feed = $feedRepository->findAll();
         $Tlfeed =  array();

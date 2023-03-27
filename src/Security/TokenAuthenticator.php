@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 class TokenAuthenticator
 {
 	
-	static array $JSON_ERROR = ['success' => false , 'code' => 401, 'message' => 'Vous devez être connecté'];
+	const ERROR = ['success' => false , 'code' => 401, 'message' => 'Vous devez être connecté'];
 	
 	public function __construct(
 		private TokenRepository $tokenRepository,
