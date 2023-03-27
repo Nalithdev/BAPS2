@@ -22,6 +22,9 @@ class Feed
     #[ORM\ManyToOne(inversedBy: 'feeds')]
     private ?User $user = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $CDate = null;
+
 
     public function getId(): ?int
     {
@@ -67,6 +70,18 @@ class Feed
     public function __toString()
     {
         return $this->title;
+    }
+
+    public function getCDate(): ?string
+    {
+        return $this->CDate;
+    }
+
+    public function setCDate(string $CDate): self
+    {
+        $this->CDate = $CDate;
+
+        return $this;
     }
 
 

@@ -27,13 +27,14 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
 
 
+#[Route('/api')]
 class AppController extends AbstractController
 {
     #[Route('/auth', name:'app_auth', methods: ['POST', 'GET'])]
     public function auth(Request $request, UserRepository $userRepository,UserPasswordHasherInterface $passwordHasher ): Response
     {
         $email = $request->request->get('email');
-        $email = "francisbertrand@gmail.com";
+        //$email = "francisbertrand@gmail.com";
         $user = $userRepository->findOneBy(['email' => $email]);
         //$user1 = $userRepository->findOneBy(['email' => 'user1@example.com']);
 
@@ -42,7 +43,7 @@ class AppController extends AbstractController
         $session = $request->getSession();
         if ($user) {
             $password = $request->request->get('password');
-            $password ="password";
+            //$password ="password";
             if ($user->getPassword() == $passwordHasher->isPasswordValid($user, $password)) {
                 $session->set('user', $user->getEmail());
                 $this->addFlash('success', 'Vous êtes connecté');
@@ -140,10 +141,13 @@ class AppController extends AbstractController
         if (!$title && !$description) {
             return $this->json(['success' => false , 'message' => 'Veuillez remplir tous les champs']);
         }
+        $dates =  date('Y-m-d H:i:s');
+;
         $feed = new Feed();
         $feed->setTitle($title);
         $feed->setDescription($description);
         $feed->setUser($id);
+        $feed->setCDate(strval($dates));
 
         $managerRegistry->getManager()->persist($feed);
         $managerRegistry->getManager()->flush();
@@ -153,28 +157,47 @@ class AppController extends AbstractController
     }
 
     #[Route('/feed', name:'app_Feed')]
-    public function Feed(FeedRepository $feedRepository): JsonResponse
+    public function Feed(FeedRepository $feedRepository , UserRepository $userRepository): JsonResponse
     {
         $feed = $feedRepository->findAll();
-        $title = [];
-        $description = [];
+
+        $Tfeed = array();
+        $Tmessage = array();
+
+
+        $x = 0;
 
         foreach ( $feed as $f){
-            $title[] = $f->getTitle();
-            $description[] = $f->getDescription();
+            $user = $userRepository->findOneBy(['id' => $f->getUser()]);
+            $Tmessage['message']['id'] = $f->getId();
+            $Tmessage['message']['title'] = $f->getTitle();
+            $Tmessage['message']['Description'] = $f->getDescription();
+            $Tmessage['message']['Date'] = $f->getCDate();
+            $Tmessage['user']['id'] = $user->getId();
+            $Tmessage['user']['firstname'] = $user->getFirstname();
+            $Tmessage['user']['lastname'] = $user->getLastname();
+            $Tmessage['user']['email'] = $user->getEmail();
+            $Tmessage['user']['siren'] = $user->getSiren();
+            $Tmessage['user']['roles'] = $user->getRoles();
+
+
+
+            array_push($Tfeed,  $Tmessage);
+
+
+
         }
 
        /* $myfeed->SetTitles("bonjour");
         $myfeed->SetDescriptions($description);*/
 
-        return $this->json(['success' => true , 'message' => 'Feed envoyer', 'titre' => $title , 'description' => $description] );
+        return $this->json(['success' => true , 'message' => 'Feed envoyer', 'Feed' => $Tfeed ]);
     }
 
-    #[Route('/check', name:'app_check' , methods: ['POST', 'GET'])]
+    #[Route('/check', name:'app_check' , methods: ['POST'])]
     public function check(Request $request , TokenRepository $tokenRepository, ManagerRegistry $managerRegistry): JsonResponse
     {
         $token = $request->request->get('token');
-        $tokens= "bCYLQwKclswfzm1PqmPl44i1_ux-rc2h5PMXBWuIQyY";
         $Mytoken = $tokenRepository->findOneBy(['token_id' => $token]);
         $date = time();
         $day = ($date - $Mytoken->getCreateDate())/86400;
