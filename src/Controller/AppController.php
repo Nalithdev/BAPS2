@@ -159,20 +159,27 @@ class AppController extends AbstractController
         $feed = $feedRepository->findAll();
         $Tlfeed =  array();
         $Tfeed = array();
+        $Tmessage = array();
+        $Tuser = array('user');
 
         $x = 0;
 
         foreach ( $feed as $f){
             $user = $userRepository->findOneBy(['id' => $f->getUser()]);
-            $Tlfeed['id'] = $user->getId();
-            $Tlfeed['title'] = $f->getTitle();
-            $Tlfeed['Description'] = $f->getDescription();
-            $Tlfeed['Date'] = $f->getCDate();
-            $Tlfeed['FN'] = $user->getFirstname();
-            $Tlfeed['LN'] = $user->getLastname();
+            $Tmessage['message']['id'] = $f->getId();
+            $Tmessage['message']['title'] = $f->getTitle();
+            $Tmessage['message']['Description'] = $f->getDescription();
+            $Tmessage['message']['Date'] = $f->getCDate();
+            $Tmessage['user']['id'] = $user->getId();
+            $Tmessage['user']['firstname'] = $user->getFirstname();
+            $Tmessage['user']['lastname'] = $user->getLastname();
+            $Tmessage['user']['email'] = $user->getEmail();
+            $Tmessage['user']['siren'] = $user->getSiren();
+            $Tmessage['user']['roles'] = $user->getRoles();
 
 
-            array_push($Tfeed,  $Tlfeed);
+
+            array_push($Tfeed,  $Tmessage);
 
 
 
@@ -188,7 +195,7 @@ class AppController extends AbstractController
     public function check(Request $request , TokenRepository $tokenRepository, ManagerRegistry $managerRegistry): JsonResponse
     {
         $token = $request->request->get('token');
-        $tokens= "bCYLQwKclswfzm1PqmPl44i1_ux-rc2h5PMXBWuIQyY";
+        //$tokens= "bCYLQwKclswfzm1PqmPl44i1_ux-rc2h5PMXBWuIQyY";
         $Mytoken = $tokenRepository->findOneBy(['token_id' => $token]);
         $date = time();
         $day = ($date - $Mytoken->getCreateDate())/86400;
