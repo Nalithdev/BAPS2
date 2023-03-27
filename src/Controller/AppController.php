@@ -25,6 +25,7 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
 
 
+#[Route('/api')]
 class AppController extends AbstractController
 {
     #[Route('/auth', name:'app_auth', methods: ['POST', 'GET'])]
@@ -157,10 +158,10 @@ class AppController extends AbstractController
     public function Feed(FeedRepository $feedRepository , UserRepository $userRepository): JsonResponse
     {
         $feed = $feedRepository->findAll();
-        $Tlfeed =  array();
+
         $Tfeed = array();
         $Tmessage = array();
-        $Tuser = array('user');
+
 
         $x = 0;
 
@@ -191,11 +192,10 @@ class AppController extends AbstractController
         return $this->json(['success' => true , 'message' => 'Feed envoyer', 'Feed' => $Tfeed ]);
     }
 
-    #[Route('/check', name:'app_check' , methods: ['POST', 'GET'])]
+    #[Route('/check', name:'app_check' , methods: ['POST'])]
     public function check(Request $request , TokenRepository $tokenRepository, ManagerRegistry $managerRegistry): JsonResponse
     {
         $token = $request->request->get('token');
-        //$tokens= "bCYLQwKclswfzm1PqmPl44i1_ux-rc2h5PMXBWuIQyY";
         $Mytoken = $tokenRepository->findOneBy(['token_id' => $token]);
         $date = time();
         $day = ($date - $Mytoken->getCreateDate())/86400;
