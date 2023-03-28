@@ -109,7 +109,6 @@ class AppController extends AbstractController
 
         $Stoken = $tokenGenerator->generateToken();
 
-
         $Ntoken = new Token();
         $Ntoken->setTokenId($Stoken);
         $Ntoken->setUserId($id);

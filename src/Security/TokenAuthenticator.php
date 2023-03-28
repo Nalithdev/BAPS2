@@ -38,12 +38,7 @@ class TokenAuthenticator
 		$result = $this->tokenRepository->findOneBy(['token_id' => $token]);
 
 
-        if ($result) {
-			$created = new \DateTime;
-			$created->setTimestamp($result->getCreateDate());
-            return $this->userRepository->findOneBy(['id' => $result->getUserId()]);
-		}
-		
-		return null;
+       return $result ? $this->userRepository->findOneBy(['id' => $result->getUserId()]) : null;
+
 	}
 }

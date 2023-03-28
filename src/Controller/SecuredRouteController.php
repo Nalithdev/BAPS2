@@ -11,6 +11,7 @@ use App\Repository\FeedRepository;
 use App\Repository\ProductRepository;
 use App\Repository\UserRepository;
 use App\Security\TokenAuthenticator;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\Persistence\ManagerRegistry;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -34,6 +35,7 @@ class SecuredRouteController extends AbstractController
 		$request = $requestStack->getCurrentRequest();
 
 		$user = $tokenAuthenticator->getUser($request);
+
 		if(!$user) throw new UnauthorizedHttpException("Bearer", 'vous devez être connecté');
 		return $this->user = $user;
 	}
@@ -41,7 +43,7 @@ class SecuredRouteController extends AbstractController
 	// TOUTES LES ROUTES CI DESSOUS NÉCESSITERONT L'AJOUT D'UN TOKEN UTILISATEUR DANS LE HEADER DE LA REQUETE
 
 
-    #[Route('/feed', name:'app_SFeed', methods: ['POST'])]
+    #[Route('/message', name:'app_SFeed', methods: ['POST'])]
     public function SendFeed(Request $request,  ManagerRegistry $managerRegistry): Response
     {
         $title = $request->request->get('title');
@@ -68,35 +70,49 @@ class SecuredRouteController extends AbstractController
 
 
 
-    #[Route('/feed', name:'app_Feed' , methods: ['GET'])]
-    public function Feed(FeedRepository $feedRepository , UserRepository $userRepository): JsonResponse
+    #[Route('/message', name:'app_Feed' , methods: ['GET'])]
+    public function Feed(FeedRepository $feedRepository , UserRepository $userRepository, Request $request): JsonResponse
     {
+        $offset = $request->query->get('offset');
+        $limit = $request->query->get('limit');
+        $criteria = new Criteria() ;
+        $criteria->orderBy(['id' => 'DESC']);
+        $criteria->setMaxResults($limit ?? 50);
+        $criteria->setFirstResult($offset ?? 0);
+        $feed = $feedRepository->matching($criteria);
 
-        $feed = $feedRepository->findAll();
-
-        $Tfeed = array();
-        $Tmessage = array();
-
-        foreach ( $feed as $f){
+        $data = [];
+        foreach ($feed as $f) {
             $user = $userRepository->findOneBy(['id' => $f->getUser()]);
-            $Tmessage['message']['id'] = $f->getId();
-            $Tmessage['message']['title'] = $f->getTitle();
-            $Tmessage['message']['Description'] = $f->getDescription();
-            $Tmessage['message']['Date'] = $f->getCDate();
-            $Tmessage['user']['id'] = $user->getId();
-            $Tmessage['user']['firstname'] = $user->getFirstname();
-            $Tmessage['user']['lastname'] = $user->getLastname();
-            $Tmessage['user']['email'] = $user->getEmail();
-            $Tmessage['user']['siren'] = $user->getSiren();
-            $Tmessage['user']['roles'] = $user->getRoles();
-
-
-
-            array_push($Tfeed,  $Tmessage);
-
+            $data[] = [
+                'id' => $f->getId(),
+                'url' => '/api/private/message/'.$f->getId(),
+            ];
         }
 
-        return $this->json(['success' => true , 'message' => 'Feed envoyer', 'Feed' => $Tfeed ]);
+        return $this->json(['success' => true , 'data' => $data ]);
+    }
+
+    #[Route('/message/{id}', name:'app_Feed_id' , methods: ['GET'])]
+    public function FeedId(FeedRepository $feedRepository , UserRepository $userRepository, $id , CommerceRepository $commerceRepository): JsonResponse
+    {
+        $feed = $feedRepository->findOneBy(['id' => $id]);
+        $user = $userRepository->findOneBy(['id' => $feed->getUser()]);
+        $shop = $commerceRepository->findOneBy(['id' => $user->getCommerce()]);
+
+        $data = [
+            'id' => $feed->getId(),
+            'title' => $feed->getTitle(),
+            'description' => $feed->getDescription(),
+            'shop' => [
+                'id' => $shop->getId(),
+                'name' => $shop->getName(),
+                'url' => '/api/private/shop/'.$shop->getId(),
+            ],
+            'date' => $feed->getCDate(),
+        ];
+
+        return $this->json(['success' => true , 'data' => $data ]);
     }
 
     #[Route('/shop', name:'app_DFeed' , methods: ['POST'])]
@@ -155,26 +171,32 @@ class SecuredRouteController extends AbstractController
         $product = $productRepository->findBy(['shop' => $shop]);
             $Tshop = array();
             $Tmessage = array();
+            $Tshoop= array();
+
+
+        $Tshoop['shop']['id'] = $shop->getId();
+        $Tshoop['shop']['name'] = $shop->getName();
+        $Tshoop['shop']['description'] = $shop->getDescription();
 
             foreach ( $product as $f) {
-                $Tmessage['produit']['id'] = $f->getId();
-                $Tmessage['produit']['title'] = $f->getName();
-                $Tmessage['produit']['Description'] = $f->getDescription();
-                $Tmessage['produit']['Price'] = $f->getPrice();
-                $Tmessage['produit']['Stock'] = $f->getStock();
-                $Tmessage['shop']['id'] = $shop->getId();
-                $Tmessage['shop']['name'] = $shop->getName();
-                $Tmessage['shop']['description'] = $shop->getDescription();
+                $Tmessage[] =[
+                    'id' => $f->getId(),
+                'title' => $f->getName(),
+                'Description' => $f->getDescription(),
+                'Price' => $f->getPrice(),
+                'Stock' => $f->getStock(),
+                ];
 
 
 
 
 
-                array_push($Tshop,  $Tmessage);
+
+
             }
 
 
-        return $this->json(['success' => true , 'message' => 'Envoie du commerce et de leur produit au client', 'shop' => $Tshop] );
+        return $this->json(['success' => true , 'message' => 'Envoie du commerce et de leur produit au client', 'shop' => $Tshoop, 'product' => $Tmessage ] );
     }
 
     #[Route('/user/{id}', name: 'user' , methods: ['GET'])]
