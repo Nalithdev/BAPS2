@@ -11,6 +11,7 @@ use App\Repository\FeedRepository;
 use App\Repository\ProductRepository;
 use App\Repository\TokenRepository;
 use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Security\TokenAuthenticator;
 use Doctrine\Persistence\ManagerRegistry;
 use Exception;
@@ -21,6 +22,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
+use Symfony\Component\String\Slugger\SluggerInterface;
+
 
 
 #[Route('/api')]
