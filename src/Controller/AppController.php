@@ -107,6 +107,11 @@ class AppController extends AbstractController
         $role = $fuser->getRoles();
 
         $Stoken = $tokenGenerator->generateToken();
+        $Mytoken = $tokenRepository->findOneBy(['user_id' => $id]);
+
+        if ($Mytoken) {
+            return $this->json  (['header' => ['code' => 200 , 'message' => 'Vous êtes connectés et votre token existe déja'] ,'token' => $Mytoken , 'id' => $id, 'role' => $role[0]]);
+        }
 
         $Ntoken = new Token();
         $Ntoken->setTokenId($Stoken);
@@ -121,14 +126,6 @@ class AppController extends AbstractController
         return $this->json  (['header' => ['code' => 200 , 'message' => 'Vous êtes connectés'] ,'token' => $Stoken , 'id' => $id, 'role' => $role[0]]);
 
     }
-    #[Route('/logout', name: 'Logout' , methods: ['POST'])]
-    public function logout(Request $request , TokenRepository $tokenRepository , ManagerRegistry $managerRegistry): Response
-    {
-        $token = $request->request->get('token');
-        $Mytoken = $tokenRepository->findOneBy(['tokenId' => $token]);
-        $managerRegistry->getManager()->remove($Mytoken);
-        $managerRegistry->getManager()->flush();
-        return $this->json(['success' => true, 'message' => 'Vous êtes déconnectés']);
-    }
+
 
 }
