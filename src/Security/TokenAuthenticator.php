@@ -40,10 +40,6 @@ class TokenAuthenticator
         if ($result) {
 			$created = new \DateTime;
 			$created->setTimestamp($result->getCreateDate());
-			if ($created < new \DateTime('-1 week')) {
-				$this->tokenRepository->remove($result);
-				return null;
-			}
             return $this->userRepository->findOneBy(['id' => $result->getUserId()]);
 		}
 		

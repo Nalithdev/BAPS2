@@ -19,8 +19,7 @@ class Token
     #[ORM\Column]
     private ?int $user_id = null;
 
-    #[ORM\Column]
-    private ?int $create_date = null;
+
 
     public function getId(): ?int
     {
@@ -52,15 +51,4 @@ class Token
         return $this;
     }
 
-    public function getCreateDate(): ?int
-    {
-        return $this->create_date;
-    }
-
-    public function setCreateDate(int $create_date): self
-    {
-        $this->create_date = $create_date;
-
-        return $this;
-    }
 }
