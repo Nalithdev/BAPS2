@@ -11,25 +11,26 @@ use App\Repository\FeedRepository;
 use App\Repository\ProductRepository;
 use App\Repository\TokenRepository;
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Security\TokenAuthenticator;
 use Doctrine\Persistence\ManagerRegistry;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
-use Symfony\Component\String\Slugger\SluggerInterface;
 
 
 
 #[Route('/api/public')]
 class AppController extends AbstractController
 {
-    #[Route('/auth', name:'app_auth', methods: ['POST', 'GET'])]
+    #[Route('/auth', name:'app_auth', methods: ['POST'])]
     public function auth(Request $request, UserRepository $userRepository,UserPasswordHasherInterface $passwordHasher ): Response
     {
         $email = $request->request->get('email');
@@ -105,7 +106,6 @@ class AppController extends AbstractController
         // Je crée une instance User dans laquelle je lui demande de chercher les id des utilisateurs
         $fuser = $userRepository->findOneBy(['id' => $id]);
         $role = $fuser->getRoles();
-        $Mytoken = $tokenRepository->findOneBy(['userId' => $id]);
 
         $Stoken = $tokenGenerator->generateToken();
 
@@ -123,6 +123,8 @@ class AppController extends AbstractController
         return $this->json  (['header' => ['code' => 200 , 'message' => 'Vous êtes connectés'] ,'token' => $Stoken , 'id' => $id, 'role' => $role[0]]);
 
     }
+
+
     #[Route('/logout', name: 'Logout' , methods: ['POST'])]
     public function logout(Request $request , TokenRepository $tokenRepository , ManagerRegistry $managerRegistry): Response
     {
@@ -131,6 +133,36 @@ class AppController extends AbstractController
         $managerRegistry->getManager()->remove($Mytoken);
         $managerRegistry->getManager()->flush();
         return $this->json(['success' => true, 'message' => 'Vous êtes déconnectés']);
+    }
+
+    #[Route('/users', name: 'users' , methods: ['GET'])]
+    public function users(Request $request , ManagerRegistry $managerRegistry, UserRepository $userRepository): Response
+
+    {
+        $criteria = new Criteria();
+        $offset = $request->query->get('offset');
+        $limit = $request->query->get('limit');
+        $criteria->setMaxResults($limit ?? 10);
+        $criteria->setFirstResult($offset ?? 0);
+        $users = $userRepository->matching($criteria);
+        foreach ($users as $user) {
+            if($user->getRoles()[0] == 'ROLE_MERCHANT' || $user->getRoles()[0] == 'ROLE_ADMIN'){
+
+
+            }
+            else{
+                $data[] = [
+
+                    'firstname' => $user->getFirstname(),
+                    'lastname' => $user->getLastname(),
+                    'email' => $user->getEmail(),
+                    'url' => '/api/private/user/'.$user->getId(),
+
+                ];
+            }
+
+        }
+        return $this->json(['success' => true, 'users' => $data]);
     }
 
 }

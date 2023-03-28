@@ -29,7 +29,7 @@ class SecuredRouteController extends AbstractController
 	/**
 	 * @throws Exception
 	 */
-	public function construct(TokenAuthenticator $tokenAuthenticator, RequestStack $requestStack)
+	public function __construct(TokenAuthenticator $tokenAuthenticator, RequestStack $requestStack)
 	{
 		$request = $requestStack->getCurrentRequest();
 
@@ -177,7 +177,26 @@ class SecuredRouteController extends AbstractController
         return $this->json(['success' => true , 'message' => 'Envoie du commerce et de leur produit au client', 'shop' => $Tshop] );
     }
 
+    #[Route('/user/{id}', name: 'user' , methods: ['GET'])]
+    public function user(UserRepository $userRepository, $id): Response
 
+    {
+        $session = $this->user;
+        $users = $userRepository->findOneBy(['id' => $id]);
+        if ($session->getRoles()[0] == 'ROLE_ADMIN' || $session>getId() == $users->getId()) {
+            $data[] = [
+                'id' => $users->getId(),
+                'firstname' => $users->getFirstname(),
+                'lastname' => $users->getLastname(),
+                'email' => $users->getEmail(),
+                'role' => $users->getRoles()[0],
+            ];
+            return $this->json(['success' => true, 'users' => $data]);
+        }else{
+            return $this->json(['success' => false, 'message' => 'Vous n\'avez pas les droits pour accéder à cette page']);
+        }
+
+    }
 
 
 }
