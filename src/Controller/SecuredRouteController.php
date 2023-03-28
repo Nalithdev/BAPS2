@@ -204,8 +204,10 @@ class SecuredRouteController extends AbstractController
 
     {
         $session = $this->user;
+
         $users = $userRepository->findOneBy(['id' => $id]);
-        if ($session->getRoles()[0] == 'ROLE_ADMIN' || $session>getId() == $users->getId()) {
+
+        if ($session->getRoles()[0] == 'ROLE_ADMIN' || $session->getId() == $users->getId()) {
             $data[] = [
                 'id' => $users->getId(),
                 'firstname' => $users->getFirstname(),
