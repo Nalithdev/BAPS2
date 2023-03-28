@@ -105,10 +105,8 @@ class AppController extends AbstractController
         // Je crée une instance User dans laquelle je lui demande de chercher les id des utilisateurs
         $fuser = $userRepository->findOneBy(['id' => $id]);
         $role = $fuser->getRoles();
-        $Mytoken = $tokenRepository->findOneBy(['userId' => $id]);
 
         $Stoken = $tokenGenerator->generateToken();
-
 
         $Ntoken = new Token();
         $Ntoken->setTokenId($Stoken);

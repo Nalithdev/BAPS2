@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\Commerce;
+use App\Entity\Feed;
 use App\Entity\Product;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -73,6 +74,15 @@ class AppFixtures extends Fixture
 
         $manager->flush();
 
+        for ($i = 1; $i <= 100; $i++) {
+            $message = new Feed();
+            $message->setTitle('Titre ' . $i);
+            $message->setDescription('Description ' . $i);
+            $message->setUser($merchant);
+            $message->setCDate(date('Y-m-d H:i:s'));
+            $manager->persist($message);
+        }
+        $manager->flush();
         //Création d'un produits
 
         // 1 - Appel d'un shop
