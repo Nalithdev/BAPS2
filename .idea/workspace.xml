@@ -4,14 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="04501c98-86f6-40b3-8c49-8bc3b4b250b5" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/services.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/services.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Controller/AppController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/AppController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Controller/SecuredRouteController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/SecuredRouteController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Security/AuthenticationFailureSubscriber.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Security/AuthenticationFailureSubscriber.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Security/TokenAuthenticator.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Security/TokenAuthenticator.php" afterDir="false" />
-    </list>
+    <list default="true" id="04501c98-86f6-40b3-8c49-8bc3b4b250b5" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
