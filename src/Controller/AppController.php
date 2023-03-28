@@ -12,6 +12,7 @@ use App\Repository\FeedRepository;
 use App\Repository\ProductRepository;
 use App\Repository\TokenRepository;
 use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -25,6 +26,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 
 #[Route('/api')]
@@ -215,7 +217,7 @@ class AppController extends AbstractController
 
     }
 
-    #[Route('/products', name:'app_product' , methods: ['POST', 'GET'])]
+    #[Route('/products', name:'app_product' , methods: [ 'GET','POST'])]
     public function product(ManagerRegistry $managerRegistry): Response
     {
 
@@ -231,10 +233,25 @@ class AppController extends AbstractController
 
     }
 
-    #[Route('/{id}', name: 'app_product_id', methods: ['GET'])]
-    public function show(Product $product): Response
+    #[Route('/create', name: 'app_create', methods: ['POST', 'GET'])]
+    public function show(Request $request, SluggerInterface $slugger, EntityManagerInterface $entityManager): Response
     {
-        return $this->json(['success' => true , 'message' => 'Produit envoyer', 'produit' => $product] );
+        $product = new Product();
+        $form = $this->createForm(ProductType::class, $product);
+        $form->handleRequest($request);
+
+        if($form->isSubmitted() && $form->isValid()){
+
+            $entityManager->persist($product);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('app_products');
+        }
+
+        return $this->render('product/product.html.twig', [
+            'form' => $form->createView(),
+
+        ]);
     }
 
 
