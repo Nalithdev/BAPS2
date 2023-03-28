@@ -62,16 +62,15 @@ class AppFixtures extends Fixture
 
         //Création d'un commerce
 
-        $user = $manager->getRepository(User::class)->findAll();
-
-        foreach($user as $s){
 
             $shop= new Commerce();
-            $shop->setName($s->getFirstname() . ' ' . $s->getLastname());
+            $shop->setName($merchant->getFirstname() . ' ' . $merchant->getLastname());
             $shop->setDescription('description du commerce');
-            $manager->persist($shop);
 
-        }
+            $manager->persist($shop);
+            $merchant->setCommerce($shop);
+
+
         $manager->flush();
 
         //Création d'un produits
@@ -80,6 +79,7 @@ class AppFixtures extends Fixture
 
         $shopRepository = $manager->getRepository(Commerce::class);
         $shop = $shopRepository->findAll();
+
 
         // 2 - Création de 10 produits
 

@@ -26,19 +26,25 @@ class TokenAuthenticator
 	public function getUser(Request $request): ?User
 	{
 		$token = $request->headers->get('Token');
-		if(!$token) return null;
-		
+		if(!$token) {
+            //chercher dans le paramètre get "token"
+            $token = $request->query->get('token');
+            if(!$token) {
+                return null;
+            }
+        }
+
+
 		$result = $this->tokenRepository->findOneBy(['token_id' => $token]);
-		
-		if ($result) {
+
+        if ($result) {
 			$created = new \DateTime;
 			$created->setTimestamp($result->getCreateDate());
 			if ($created < new \DateTime('-1 week')) {
 				$this->tokenRepository->remove($result);
 				return null;
 			}
-			
-			return $this->userRepository->findOneBy(['id' => $result->getUserId()]);
+            return $this->userRepository->findOneBy(['id' => $result->getUserId()]);
 		}
 		
 		return null;
