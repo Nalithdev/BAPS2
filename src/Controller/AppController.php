@@ -7,26 +7,23 @@ use App\Entity\Feed;
 use App\Entity\Product;
 use App\Entity\Token;
 use App\Entity\User;
-use App\Controller\Senderfeed;
 use App\Repository\FeedRepository;
 use App\Repository\ProductRepository;
 use App\Repository\TokenRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Security\TokenAuthenticator;
 use Doctrine\Persistence\ManagerRegistry;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Csrf\CsrfToken;
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
 use Symfony\Component\String\Slugger\SluggerInterface;
+
 
 
 #[Route('/api')]
@@ -129,130 +126,8 @@ class AppController extends AbstractController
 
 
 
-        return $this->json  (['token' => $Stoken , 'id' => $id, 'role' => $role[0]]);
+        return $this->json  (['header' => ['code' => 200 , 'message' => 'Vous êtes connectés'] ,'token' => $Stoken , 'id' => $id, 'role' => $role[0]]);
 
     }
-
-    #[Route('/SFeed', name:'app_SFeed', methods: ['POST', 'GET'])]
-    public function SendFeed(Request $request,  ManagerRegistry $managerRegistry): Response
-    {
-        $title = $request->request->get('title');
-        $description = $request->request->get('description');
-        $id = $request->request->get('id');
-
-        if (!$title && !$description) {
-            return $this->json(['success' => false , 'message' => 'Veuillez remplir tous les champs']);
-        }
-        $dates =  date('Y-m-d H:i:s');
-;
-        $feed = new Feed();
-        $feed->setTitle($title);
-        $feed->setDescription($description);
-        $feed->setUser($id);
-        $feed->setCDate(strval($dates));
-
-        $managerRegistry->getManager()->persist($feed);
-        $managerRegistry->getManager()->flush();
-
-
-        return $this->json(['success' => true , 'message' => 'Feed envoyer']);
-    }
-
-    #[Route('/feed', name:'app_Feed')]
-    public function Feed(FeedRepository $feedRepository , UserRepository $userRepository): JsonResponse
-    {
-        $feed = $feedRepository->findAll();
-
-        $Tfeed = array();
-        $Tmessage = array();
-
-
-        $x = 0;
-
-        foreach ( $feed as $f){
-            $user = $userRepository->findOneBy(['id' => $f->getUser()]);
-            $Tmessage['message']['id'] = $f->getId();
-            $Tmessage['message']['title'] = $f->getTitle();
-            $Tmessage['message']['Description'] = $f->getDescription();
-            $Tmessage['message']['Date'] = $f->getCDate();
-            $Tmessage['user']['id'] = $user->getId();
-            $Tmessage['user']['firstname'] = $user->getFirstname();
-            $Tmessage['user']['lastname'] = $user->getLastname();
-            $Tmessage['user']['email'] = $user->getEmail();
-            $Tmessage['user']['siren'] = $user->getSiren();
-            $Tmessage['user']['roles'] = $user->getRoles();
-
-
-
-            array_push($Tfeed,  $Tmessage);
-
-
-
-        }
-
-       /* $myfeed->SetTitles("bonjour");
-        $myfeed->SetDescriptions($description);*/
-
-        return $this->json(['success' => true , 'message' => 'Feed envoyer', 'Feed' => $Tfeed ]);
-    }
-
-    #[Route('/check', name:'app_check' , methods: ['POST'])]
-    public function check(Request $request , TokenRepository $tokenRepository, ManagerRegistry $managerRegistry): JsonResponse
-    {
-        $token = $request->request->get('token');
-        $Mytoken = $tokenRepository->findOneBy(['token_id' => $token]);
-        $date = time();
-        $day = ($date - $Mytoken->getCreateDate())/86400;
-        if ($day < 7){
-            return $this->json(['success' => true , 'message' => 'Token valide, donc connecition autorisé']);
-        }
-        else{
-            $managerRegistry->getManager()->remove($Mytoken);
-            return $this->json(['success' => false , 'message' => 'Token invalide, donc connecition non autorisé']);
-        }
-
-
-
-
-
-    }
-
-    #[Route('/products', name:'app_product' , methods: [ 'GET','POST'])]
-    public function product(ManagerRegistry $managerRegistry): Response
-    {
-
-        $product = new Product();
-        $product->setName('name');
-        $product->setDescription('description');
-        $product->setPrice(rand(1, 100));
-        $product->setStock(rand(1, 100));
-        $managerRegistry->getManager()->persist($product);
-        $managerRegistry->getManager()->flush();
-        return $this->json(['success' => true , 'message' => 'Produit envoyer', 'produit' => $product] );
-
-
-    }
-
-    #[Route('/create', name: 'app_create', methods: ['POST', 'GET'])]
-    public function show(Request $request, SluggerInterface $slugger, EntityManagerInterface $entityManager): Response
-    {
-        $product = new Product();
-        $form = $this->createForm(ProductType::class, $product);
-        $form->handleRequest($request);
-
-        if($form->isSubmitted() && $form->isValid()){
-
-            $entityManager->persist($product);
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_products');
-        }
-
-        return $this->render('product/product.html.twig', [
-            'form' => $form->createView(),
-
-        ]);
-    }
-
 
 }
