@@ -26,7 +26,7 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 
 
 
-#[Route('/api')]
+#[Route('/api/public')]
 class AppController extends AbstractController
 {
     #[Route('/auth', name:'app_auth', methods: ['POST', 'GET'])]

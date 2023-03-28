@@ -5,22 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="04501c98-86f6-40b3-8c49-8bc3b4b250b5" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/BAPS2.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/migrations/Version20230327134304.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Controller/SecuredRouteController.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Security/AuthenticationFailureSubscriber.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Security/TokenAuthenticator.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config/services.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/services.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/Version20230323133157.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/Version20230327084206.php" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Controller/AppController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/AppController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Controller/Senderfeed.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/DataFixtures/AppFixtures.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/DataFixtures/AppFixtures.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Controller/SecuredRouteController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/SecuredRouteController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Security/AuthenticationFailureSubscriber.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Security/AuthenticationFailureSubscriber.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Security/TokenAuthenticator.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Security/TokenAuthenticator.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -130,10 +120,6 @@
       <path value="$PROJECT_DIR$/vendor/psr/log" />
       <path value="$PROJECT_DIR$/vendor/psr/clock" />
       <path value="$PROJECT_DIR$/vendor/psr/container" />
-      <path value="$PROJECT_DIR$/vendor/symfony/mime" />
-      <path value="$PROJECT_DIR$/vendor/symfony/polyfill-intl-idn" />
-      <path value="$PROJECT_DIR$/vendor/sensio/framework-extra-bundle" />
-      <path value="$PROJECT_DIR$/vendor/twig/extra-bundle" />
     </include_path>
   </component>
   <component name="ProjectId" id="2Naa9a0cUbMXsZVUqJfzGJ2wJgj" />

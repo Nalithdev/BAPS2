@@ -25,7 +25,7 @@ class AuthenticationFailureSubscriber implements EventSubscriberInterface
 		if ($exception instanceof \Exception) {
 			$response = new UnauthorizedHttpException('Bearer', $exception->getMessage());
 			$event->setResponse(new JsonResponse(
-				['message' => 'Vous devez être connecté pour effectuer cette action', 'code' => 401],
+				['message' => $response->getMessage(), 'code' => 401],
 				$response->getStatusCode()));
 		}
 	}
