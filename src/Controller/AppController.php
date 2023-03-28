@@ -153,40 +153,7 @@ class AppController extends AbstractController
     }
 	
 	
-	#[Route('/feed', name:'app_Feed')]
-    public function Feed(Request $request, FeedRepository $feedRepository , UserRepository $userRepository, TokenAuthenticator $tokenAuthenticator): JsonResponse
-    {
-		
-        $feed = $feedRepository->findAll();
-
-        $Tfeed = array();
-        $Tmessage = array();
-
-
-        $x = 0;
-
-        foreach ( $feed as $f){
-            $user = $userRepository->findOneBy(['id' => $f->getUser()]);
-
-            $Tmessage['message']['id'] = $f->getId();
-            $Tmessage['message']['title'] = $f->getTitle();
-            $Tmessage['message']['Description'] = $f->getDescription();
-            $Tmessage['message']['Date'] = $f->getCDate();
-            $Tmessage['user']['id'] = $user->getId();
-            $Tmessage['user']['firstname'] = $user->getFirstname();
-            $Tmessage['user']['lastname'] = $user->getLastname();
-            $Tmessage['user']['email'] = $user->getEmail();
-            $Tmessage['user']['siren'] = $user->getSiren();
-            $Tmessage['user']['roles'] = $user->getRoles();
-
-
-
-            array_push($Tfeed,  $Tmessage);
-
-        }
-
-        return $this->json(['success' => true , 'message' => 'Feed envoyer', 'Feed' => $Tfeed ]);
-    }
+	
 
 
 

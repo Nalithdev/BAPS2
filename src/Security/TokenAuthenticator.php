@@ -6,12 +6,10 @@ use App\Repository\TokenRepository;
 use App\Repository\UserRepository;
 use Exception;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class TokenAuthenticator
 {
-	
-	const ERROR = ['success' => false , 'code' => 401, 'message' => 'Vous devez être connecté'];
-	
 	public function __construct(
 		private TokenRepository $tokenRepository,
 		private UserRepository $userRepository
@@ -26,7 +24,11 @@ class TokenAuthenticator
 	public function getUser(Request $request): ?User
 	{
 		$token = $request->headers->get('Token');
-		if(!$token) return null;
+		if(!$token) {
+			$token = $request->query->get('token');
+			
+			if(!$token) ApiError::error_401('Aucun token fourni');
+		};
 		
 		$result = $this->tokenRepository->findOneBy(['token_id' => $token]);
 		
