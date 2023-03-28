@@ -113,6 +113,7 @@ class AppController extends AbstractController
         if ($Mytoken) {
             return $this->json  (['header' => ['code' => 200 , 'message' => 'Vous êtes connectés et votre token existe déja'] ,'token' => $Mytoken , 'id' => $id, 'role' => $role[0]]);
         }
+        //bonjour
 
         $Ntoken = new Token();
         $Ntoken->setTokenId($Stoken);
