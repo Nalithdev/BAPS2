@@ -8,6 +8,7 @@ use App\Entity\Product;
 use App\Entity\User;
 use App\Repository\CommerceRepository;
 use App\Repository\FeedRepository;
+use App\Repository\ProductRepository;
 use App\Repository\UserRepository;
 use App\Security\TokenAuthenticator;
 use Doctrine\Persistence\ManagerRegistry;
@@ -39,14 +40,14 @@ class SecuredRouteController extends AbstractController
 	// TOUTES LES ROUTES CI DESSOUS NÉCESSITERONT L'AJOUT D'UN TOKEN UTILISATEUR DANS LE HEADER DE LA REQUETE
 
 
-    #[Route('/feed/register', name:'app_SFeed', methods: ['POST'])]
+    #[Route('/feed', name:'app_SFeed', methods: ['POST'])]
     public function SendFeed(Request $request,  ManagerRegistry $managerRegistry): Response
     {
         $title = $request->request->get('title');
         $description = $request->request->get('description');
         $id = $request->request->get('id');
 
-        if (!$title && !$description) {
+        if (!$title || !$description) {
             return $this->json(['success' => false , 'message' => 'Veuillez remplir tous les champs']);
         }
         $dates =  date('Y-m-d H:i:s');
@@ -65,7 +66,7 @@ class SecuredRouteController extends AbstractController
     }
 
 
-    #[Route('/feed/send', name:'app_Feed' ,methods: ['GET'])]
+    #[Route('/feed', name:'app_Feed' , methods: ['GET'])]
     public function Feed(FeedRepository $feedRepository , UserRepository $userRepository): JsonResponse
     {
 
@@ -74,12 +75,8 @@ class SecuredRouteController extends AbstractController
         $Tfeed = array();
         $Tmessage = array();
 
-
-        $x = 0;
-
         foreach ( $feed as $f){
             $user = $userRepository->findOneBy(['id' => $f->getUser()]);
-
             $Tmessage['message']['id'] = $f->getId();
             $Tmessage['message']['title'] = $f->getTitle();
             $Tmessage['message']['Description'] = $f->getDescription();
@@ -100,7 +97,7 @@ class SecuredRouteController extends AbstractController
         return $this->json(['success' => true , 'message' => 'Feed envoyer', 'Feed' => $Tfeed ]);
     }
 
-    #[Route('/shop/create', name:'app_DFeed')]
+    #[Route('/shop', name:'app_DFeed' , methods: ['POST'])]
     public function CreateShop(Request $request , ManagerRegistry $managerRegistry ): JsonResponse
     {
         $user = $this->user;
@@ -118,7 +115,7 @@ class SecuredRouteController extends AbstractController
     }
 
 
-    #[Route('/product/register', name:'app_product' , methods: ['POST', 'GET'])]
+    #[Route('/product', name:'app_product' , methods: ['POST'])]
     public function product(ManagerRegistry $managerRegistry, Request $request , CommerceRepository $commerceRepository): Response
     {
         $user = $this->user;
@@ -147,11 +144,40 @@ class SecuredRouteController extends AbstractController
 
     }
 
-    #[Route('/shop/send/{id}', name: 'app_product_id', methods: ['GET'])]
-    public function show(Product $product): Response
+    #[Route('/shop/{id}', name: 'app_product_id', methods: ['GET'])]
+    public function show(ProductRepository $productRepository , CommerceRepository $commerceRepository , $id ): Response
     {
-        return $this->json(['success' => true , 'message' => 'Produit envoyer', 'produit' => $product] );
+        $shop = $commerceRepository->findOneBy(['id' => $id]);
+        if ($shop == null){
+            return $this->json(['success' => false , 'message' => 'Ce commerce n\'existe pas' ] );
+        }
+
+
+        $product = $productRepository->findBy(['shop' => $shop]);
+            $Tshop = array();
+            $Tmessage = array();
+
+            foreach ( $product as $f) {
+                $Tmessage['produit']['id'] = $f->getId();
+                $Tmessage['produit']['title'] = $f->getName();
+                $Tmessage['produit']['Description'] = $f->getDescription();
+                $Tmessage['produit']['Price'] = $f->getPrice();
+                $Tmessage['produit']['Stock'] = $f->getStock();
+                $Tmessage['shop']['id'] = $shop->getId();
+                $Tmessage['shop']['name'] = $shop->getName();
+                $Tmessage['shop']['description'] = $shop->getDescription();
+
+
+
+
+
+                array_push($Tshop,  $Tmessage);
+            }
+
+
+        return $this->json(['success' => true , 'message' => 'Envoie du commerce et de leur produit au client', 'shop' => $Tshop] );
     }
+
 
 
 

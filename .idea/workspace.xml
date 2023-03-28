@@ -5,16 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="04501c98-86f6-40b3-8c49-8bc3b4b250b5" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/migrations/Version20230327134304.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/BAPS2.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/BAPS2.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/Version20230327081210.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/Version20230327084206.php" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Controller/AppController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/AppController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Controller/SecuredRouteController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Controller/SecuredRouteController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/DataFixtures/AppFixtures.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/DataFixtures/AppFixtures.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Security/TokenAuthenticator.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Security/TokenAuthenticator.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -166,7 +159,7 @@
       <option name="presentableId" value="Default" />
       <updated>1679904496243</updated>
       <workItem from="1679904497293" duration="6549000" />
-      <workItem from="1679921164540" duration="7553000" />
+      <workItem from="1679921164540" duration="11154000" />
     </task>
     <servers />
   </component>

@@ -30,22 +30,15 @@ class AppController extends AbstractController
     public function auth(Request $request, UserRepository $userRepository,UserPasswordHasherInterface $passwordHasher ): Response
     {
         $email = $request->request->get('email');
-        //$email = "francisbertrand@gmail.com";
         $user = $userRepository->findOneBy(['email' => $email]);
-        //$user1 = $userRepository->findOneBy(['email' => 'user1@example.com']);
-
-
 
         $session = $request->getSession();
         if ($user) {
             $password = $request->request->get('password');
-            //$password ="password";
             if ($user->getPassword() == $passwordHasher->isPasswordValid($user, $password)) {
                 $session->set('user', $user->getEmail());
                 $this->addFlash('success', 'Vous êtes connecté');
                 return $this->redirectToRoute('app_auth1' , [ 'id' => $user->getId()]);
-
-                //new JsonResponse(['success' => true, 'message' => 'Vous etes connecte' , $session->get('user')]);
 
             }
 
@@ -104,11 +97,16 @@ class AppController extends AbstractController
 
     }
     #[Route('/auth1/{id}', name: 'app_auth1')]
-    public function auth1(Request $request, UserRepository $userRepository, $id, ManagerRegistry $managerRegistry, TokenGeneratorInterface $tokenGenerator ): JsonResponse
+    public function auth1(Request $request, UserRepository $userRepository, $id, ManagerRegistry $managerRegistry, TokenGeneratorInterface $tokenGenerator, TokenRepository $tokenRepository ): JsonResponse
     {
         // Je crée une instance User dans laquelle je lui demande de chercher les id des utilisateurs
         $fuser = $userRepository->findOneBy(['id' => $id]);
         $role = $fuser->getRoles();
+        $Mytoken = $tokenRepository->findOneBy(['userId' => $id]);
+        if ($Mytoken) {
+            $managerRegistry->getManager()->remove($Mytoken);
+            $managerRegistry->getManager()->flush();
+        }
         $Stoken = $tokenGenerator->generateToken();
 
         $date = time();
