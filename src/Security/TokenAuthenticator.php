@@ -27,6 +27,7 @@ class TokenAuthenticator
 	{
 		$token = $request->headers->get('Token');
 		if(!$token) {
+
             //chercher dans le paramètre get "token"
             $token = $request->query->get('token');
             if(!$token) {
@@ -34,8 +35,8 @@ class TokenAuthenticator
             }
         }
 
-
 		$result = $this->tokenRepository->findOneBy(['token_id' => $token]);
+
 
         if ($result) {
 			$created = new \DateTime;

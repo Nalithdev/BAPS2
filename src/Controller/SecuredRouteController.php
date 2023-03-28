@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/api')]
+#[Route('/api/private')]
 class SecuredRouteController extends AbstractController
 {
 	public User $user;
@@ -29,9 +29,10 @@ class SecuredRouteController extends AbstractController
 	/**
 	 * @throws Exception
 	 */
-	public function __construct(TokenAuthenticator $tokenAuthenticator, RequestStack $requestStack)
+	public function construct(TokenAuthenticator $tokenAuthenticator, RequestStack $requestStack)
 	{
 		$request = $requestStack->getCurrentRequest();
+
 		$user = $tokenAuthenticator->getUser($request);
 		if(!$user) throw new UnauthorizedHttpException("Bearer", 'vous devez être connecté');
 		return $this->user = $user;
@@ -64,6 +65,7 @@ class SecuredRouteController extends AbstractController
 
         return $this->json(['success' => true , 'message' => 'Feed envoyer']);
     }
+
 
 
     #[Route('/feed', name:'app_Feed' , methods: ['GET'])]
@@ -125,9 +127,6 @@ class SecuredRouteController extends AbstractController
             $shop = $commerceRepository->findOneBy(['id' => $commerce]);
 
 
-
-
-
         $product = new Product();
         $product->setName($request->request->get('name'));
         $product->setDescription($request->request->get('description'));
@@ -137,7 +136,7 @@ class SecuredRouteController extends AbstractController
         $managerRegistry->getManager()->persist($product);
         $managerRegistry->getManager()->flush();
 
-        return $this->json(['success' => true , 'message' => 'Produit envoyer'] );
+        return $this->json(['success' => true , 'message' => 'Produit envoyer', 'produit' => $product] );
         }
         return $this->json(['success' => false , 'message' => 'Vous n\'avez pas les droits pour accéder à cette page' ] );
 
