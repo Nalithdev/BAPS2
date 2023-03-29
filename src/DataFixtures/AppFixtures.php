@@ -123,6 +123,19 @@ class AppFixtures extends Fixture
         }
         $manager->flush();
 
+        $productRepository = $manager->getRepository(Product::class);
+        $product = $productRepository->findAll();
+            $reservation2 = new Reservation();
+            $reservation2->setUser($user);
+            $reservation2->setProduct($product[rand(0, count($product) - 1)]);
+            $reservation2->setQuantity(rand(1, 100));
+            $date = new \DateTime('2023-03-28 12:00:00');
+
+            $reservation2->setCDate($date);
+            $manager->persist($reservation2);
+
+        $manager->flush();
+
 
 
 //Créer des reservations
