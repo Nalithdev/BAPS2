@@ -132,7 +132,7 @@ class AppController extends AbstractController
 
 
     #[Route('/users', name: 'users' , methods: ['GET'])]
-    public function users(Request $request , ManagerRegistry $managerRegistry, UserRepository $userRepository): Response
+    public function users(Request $request , UserRepository $userRepository): Response
 
     {
         $criteria = new Criteria();

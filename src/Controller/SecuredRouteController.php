@@ -282,7 +282,7 @@ class SecuredRouteController extends AbstractController
     }
 
 
-    #[Route('/reservation/{id}', name: 'user' , methods: ['PUT'])]
+    #[Route('shop/reservation/{id}/modify', name: 'modify_reservation' , methods: ['PUT'])]
     public function pot_reserved( Request $request ,ReservationRepository $reservationRepository, $id): Response
 
     {
@@ -290,6 +290,7 @@ class SecuredRouteController extends AbstractController
         $shop_reservation_id = $reservationRepository->findOneBy(['id' => $id]);
 
         if ($session->getRoles()[0] == 'ROLE_MERCHANT') {
+            dd($shop_reservation_id);
             $shop_reservation_id->setStatus($request->request->get('status'));
             $this->getStatus()->getManager()->flush();
             return $this->json(['success' => true, 'message' => 'La reservation a bien été modifier']);
