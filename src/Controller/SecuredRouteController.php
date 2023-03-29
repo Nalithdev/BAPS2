@@ -11,6 +11,7 @@ use App\Repository\CommerceRepository;
 use App\Repository\FeedRepository;
 use App\Repository\ProductRepository;
 use App\Repository\ReservationRepository;
+use App\Repository\TokenRepository;
 use App\Repository\UserRepository;
 use App\Security\TokenAuthenticator;
 use Doctrine\Common\Collections\Criteria;
@@ -24,7 +25,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/api/private')]
+#[Route('/api')]
 class SecuredRouteController extends AbstractController
 {
     public User $user;
@@ -185,22 +186,6 @@ class SecuredRouteController extends AbstractController
             ];
         }
 
-        /*
-        $Tshoop['shop']['id'] = $shop->getId();
-        $Tshoop['shop']['name'] = $shop->getName();
-        $Tshoop['shop']['description'] = $shop->getDescription();
-        array_push($Tshop, $Tshoop);
-            foreach ( $product as $f) {
-                $Tmessage['product'] =[
-                    'id' => $f->getId(),
-                'title' => $f->getName(),
-                'Description' => $f->getDescription(),
-                'Price' => $f->getPrice(),
-                'Stock' => $f->getStock(),
-                ];
-                array_push($Tshop, $Tmessage);
-            }
-        */
 
         $Tshop = [
             'id' => $shop->getId(),
@@ -255,7 +240,7 @@ class SecuredRouteController extends AbstractController
     }
 
     #[Route('/shop/{id}/reservations', name: 'reserved_get', methods: ['GET'])]
-    public function ReservedGet(Commerce $commerce): Response
+    public function ReservedGet(Commerce $commerce, ManagerRegistry $managerRegistry): Response
 
     {
 
@@ -266,6 +251,13 @@ class SecuredRouteController extends AbstractController
             $data = array();
 
             foreach ($reservations as $r) {
+                if ($r->getCdate() < new \DateTime("1day ago"))
+                {
+                    $managerRegistry->getManager()->remove($r);
+                    $managerRegistry->getManager()->flush();
+                    return $this->json(['success' => false, 'message' => 'Votre réservation a expiré']);
+
+                }
 
                 $data[] = [
 
@@ -282,7 +274,7 @@ class SecuredRouteController extends AbstractController
     }
 
 
-    #[Route('/shop/reservation/{id}/modify', name: 'modify_reservation', methods: ['POST', 'PUT'])]
+    #[Route('/shop/reservation/{id}/modify', name: 'modify_reservation', methods: ['PUT', 'POST'])]
     public function pot_reserved(Request $request, ReservationRepository $reservationRepository, $id, ManagerRegistry $managerRegistry): Response
 
     {
@@ -291,19 +283,27 @@ class SecuredRouteController extends AbstractController
         $shop_reservation_id = $reservationRepository->findOneBy(['id' => $id]);
         if ($session->getRoles()[0] == 'ROLE_MERCHANT') {
             $status = $request->request->get('status');
+            if ($status)
+            {
+                $shop_reservation_id->setStatus($status);
+                $date = new \DateTime();
 
-            $shop_reservation_id->setStatus($status);
-            $date = new \DateTime();
+                $shop_reservation_id->setCdate($date);
+                $managerRegistry->getManager()->persist($shop_reservation_id);
+                $managerRegistry->getManager()->flush();
 
-            $shop_reservation_id->setCdate($date);
-            $managerRegistry->getManager()->persist($shop_reservation_id);
-            $managerRegistry->getManager()->flush();
+                return $this->json(['success' => true, 'message' => 'La reservation a bien été modifier']);
+            }
+            else
+            {
+                return $this->json(['success' => false, 'message' => 'Vous devez renseigner un status']);
+            }
 
-            return $this->json(['success' => true, 'message' => 'La reservation a bien été modifier']);
+
 
 
         } else {
-            return $this->json(['success' => false, 'message' => 'Vous ne pouvez plus modifier cette reservation']);
+            return $this->json(['success' => false, 'message' => "Vous n'avez pas les droits pour accéder à cette page car vous êtes pas un marchand"]);
         }
     }
 
@@ -326,13 +326,21 @@ class SecuredRouteController extends AbstractController
     }
 
     #[Route('/reservation', name: 'get_reservation', methods: ['GET'])]
-    public function get_reserved(ReservationRepository $reservationRepository): Response
+    public function get_reserved(ReservationRepository $reservationRepository, ManagerRegistry $managerRegistry): Response
 
     {
         $data = array();
         $session = $this->user;
+
         $reservations = $reservationRepository->findBy(['user' => $session]);
         foreach ($reservations as $r) {
+            if ($r->getCdate() < new \DateTime("1day ago"))
+            {
+                $managerRegistry->getManager()->remove($r);
+                $managerRegistry->getManager()->flush();
+                return $this->json(['success' => false, 'message' => 'Votre réservation a expiré']);
+
+            }
             $data[] = [
                 'id' => $r->getId(),
                 'product' => $r->getProduct()->getId(),
@@ -341,5 +349,19 @@ class SecuredRouteController extends AbstractController
             ];
         }
         return $this->json(['success' => true, 'message' => 'Voici vos réservations', 'reservation' => $data]);
+    }
+
+
+    #[Route('/logout', name: 'disconect' , methods: ['GET'])]
+    public function disconnect(Request $request, ManagerRegistry $managerRegistry, TokenRepository $tokenRepository): Response
+    {
+        $user = $this->user;
+        $Mytoken = $tokenRepository->findOne(['user_id' => $user->getId()]);
+        $managerRegistry->getManager()->remove($Mytoken);
+        $managerRegistry->getManager()->flush();
+
+
+
+        return $this->json(['success' => true, 'message' => 'Vous êtes déconnecté']);
     }
 }

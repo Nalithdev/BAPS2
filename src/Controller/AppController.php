@@ -27,10 +27,10 @@ use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
 
 
 
-#[Route('/api/public')]
+#[Route('/api')]
 class AppController extends AbstractController
 {
-    #[Route('/auth', name:'app_auth', methods: ['POST'])]
+    #[Route('/login', name:'app_auth', methods: ['POST'])]
     public function auth(Request $request, UserRepository $userRepository,UserPasswordHasherInterface $passwordHasher ): Response
     {
         $email = $request->request->get('email');
