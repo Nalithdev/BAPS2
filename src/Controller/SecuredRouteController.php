@@ -298,7 +298,8 @@ class SecuredRouteController extends AbstractController
             $date = new \DateTime();
 
             $shop_reservation_id->setCdate($date);
-            $shop_reservation_id->$managerRegistry->getManager()->persist($shop_reservation_id);
+            $managerRegistry->getManager()->persist($shop_reservation_id);
+            $managerRegistry->getManager()->flush();
 
             return $this->json(['success' => true, 'message' => 'La reservation a bien été modifier']);
 
