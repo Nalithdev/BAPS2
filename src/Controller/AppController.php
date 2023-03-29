@@ -80,6 +80,7 @@ class AppController extends AbstractController
                     $Nuser->setRoles(['ROLE_MERCHANT']);
                     $Nuser->setSiren($request->request->get('siren'));
                     $Nuser->setApproved(false);
+                    $Nuser->setLoyaltyPoints(0);
                 } else {
                     return new JsonResponse(['success' => false, 'message' => 'Vous devez renseigner un siren']);
                 }

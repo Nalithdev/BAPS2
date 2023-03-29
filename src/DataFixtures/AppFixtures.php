@@ -25,6 +25,7 @@ class AppFixtures extends Fixture
 		$user->setPassword($this->passwordHasher->hashPassword($user, 'password'));
 		$user->setFirstname('Francis');
 		$user->setLastname('Bertrand');
+        $user->setLoyaltyPoints(0);
 		
 		$user->setRoles(['ROLE_USER']);
 		
