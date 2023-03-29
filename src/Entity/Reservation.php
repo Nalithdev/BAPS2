@@ -23,11 +23,11 @@ class Reservation
     #[ORM\Column]
     private ?int $quantity = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $Cdate = null;
-
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $status = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $Cdate = null;
 
     public function getId(): ?int
     {
@@ -70,17 +70,6 @@ class Reservation
         return $this;
     }
 
-    public function getCdate(): ?\DateTimeInterface
-    {
-        return $this->Cdate;
-    }
-
-    public function setCdate(\DateTimeInterface $Cdate): self
-    {
-        $this->Cdate = $Cdate;
-
-        return $this;
-    }
 
     public function getStatus(): ?string
     {
@@ -90,6 +79,18 @@ class Reservation
     public function setStatus(?string $status): self
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getCdate(): ?\DateTimeInterface
+    {
+        return $this->Cdate;
+    }
+
+    public function setCdate(\DateTimeInterface $Cdate): self
+    {
+        $this->Cdate = $Cdate;
 
         return $this;
     }
