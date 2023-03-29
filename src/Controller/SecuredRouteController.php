@@ -304,8 +304,25 @@ class SecuredRouteController extends AbstractController
             return $this->json(['success' => true, 'message' => 'La reservation a bien été modifier']);
 
 
-        }else{
+        } else {
             return $this->json(['success' => false, 'message' => 'Vous ne pouvez plus modifier cette reservation']);
+        }
+    }
+
+        #[Route('/shop/reservation/{id}/delete', name: 'delete_reservation' , methods: ['DELETE'])]
+    public function delete_reserved(ReservationRepository $reservationRepository, $id, ManagerRegistry $managerRegistry): Response
+    {
+        $session = $this->user;
+
+        $shop_reservation_id = $reservationRepository->findOneBy(['id' => $id]);
+        if ($session->getRoles()[0] == 'ROLE_MERCHANT') {
+            $managerRegistry->getManager()->remove($shop_reservation_id);
+            $managerRegistry->getManager()->flush();
+
+            return $this->json(['success' => true, 'message' => 'La reservation a bien été supprimer']);
+
+        }else{
+            return $this->json(['success' => false, 'message' => 'Vous ne pouvez plus supprimer cette reservation']);
         }
 
     }
