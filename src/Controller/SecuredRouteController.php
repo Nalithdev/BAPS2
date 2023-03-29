@@ -268,7 +268,7 @@ class SecuredRouteController extends AbstractController
                 $data[] = [
 
                     'id' => $r->getId(),
-                    'product' => $r->getProduct()->getId(),
+                    'product' => $r->getProduct()->getId( ),
                     'quantity' => $r->getQuantity(),
                     'date' => $r->getCdate(),
                 ];
