@@ -10,6 +10,7 @@ use App\Entity\User;
 use App\Repository\CommerceRepository;
 use App\Repository\FeedRepository;
 use App\Repository\ProductRepository;
+use App\Repository\ReservationRepository;
 use App\Repository\UserRepository;
 use App\Security\TokenAuthenticator;
 use Doctrine\Common\Collections\Criteria;
@@ -249,6 +250,7 @@ class SecuredRouteController extends AbstractController
         $managerRegistry->getManager()->persist($reservation);
         $managerRegistry->getManager()->flush();
 
+
         return $this->json(['success' => true, 'message' => 'Votre réservation a bien été prise en compte']);
 
     }
@@ -277,5 +279,26 @@ class SecuredRouteController extends AbstractController
             return $this->json(['success' => true, 'message' => 'Voici les réservations de vos clients', 'reservation' => $data]);
         }
         return $this->json(['success' => false, 'message' => 'Vous n\'avez pas les droits pour accéder à cette page']);
+    }
+
+
+    #[Route('/reservation/{id}', name: 'user' , methods: ['PUT'])]
+    public function pot_reserved( Request $request ,ReservationRepository $reservationRepository, $id): Response
+
+    {
+        $session = $this->user;
+        $shop_reservation_id = $reservationRepository->findOneBy(['id' => $id]);
+        $user = $shop_reservation_id->getUser();
+
+        if ($session->getRoles()[0] == 'ROLE_MERCHANT') {
+            $shop_reservation_id->setProduct($request->request->get(''));
+            $this->getProduct()->getManager()->flush();
+            return $this->json(['success' => true, 'message' => 'La reservation a bien été modifier']);
+
+
+        }else{
+            return $this->json(['success' => false, 'message' => 'Vous ne pouvez plus modifier cette reservation']);
+        }
+
     }
 }
