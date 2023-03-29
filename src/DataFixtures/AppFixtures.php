@@ -5,6 +5,7 @@ namespace App\DataFixtures;
 use App\Entity\Commerce;
 use App\Entity\Feed;
 use App\Entity\Product;
+use App\Entity\Reservation;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -74,6 +75,8 @@ class AppFixtures extends Fixture
 
         $manager->flush();
 
+
+
         for ($i = 1; $i <= 100; $i++) {
             $message = new Feed();
             $message->setTitle('Titre ' . $i);
@@ -105,7 +108,28 @@ class AppFixtures extends Fixture
 
         $manager->flush();
 
+        $productRepository = $manager->getRepository(Product::class);
+        $product = $productRepository->findAll();
+        for ($i = 1; $i <= 20; $i++) {
+            $reservation = new Reservation();
+            $reservation->setUser($user);
+            $reservation->setProduct($product[rand(0, count($product) - 1)]);
+            $reservation->setQuantity(rand(1, 100));
+            $date = new \DateTime();
+
+            $reservation->setCDate($date);
+            $manager->persist($reservation);
+        }
+        $manager->flush();
+
+
+
+//Créer des reservations
+        //recuperer l'user avec le role merchant
+
+
 
 
     }
+
 }
