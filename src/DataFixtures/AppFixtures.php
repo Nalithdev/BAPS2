@@ -54,7 +54,7 @@ class AppFixtures extends Fixture
 		$merchant->setLastname('Lafont');
 		$merchant->setSiren('123456789');
 		$merchant->setApproved(false);
-		
+		$merchant->setLoyaltyPoints(100);
 		$merchant->setRoles(['ROLE_MERCHANT']);
 		
 		$manager->persist($merchant);
@@ -128,6 +128,7 @@ class AppFixtures extends Fixture
             $reservation2->setUser($user);
             $reservation2->setProduct($product[rand(0, count($product) - 1)]);
             $reservation2->setQuantity(rand(1, 100));
+            $reservation2->setStatus('reserved');
             $date = new \DateTime('2023-03-28 12:00:00');
 
             $reservation2->setCDate($date);
