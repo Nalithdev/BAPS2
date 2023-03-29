@@ -51,6 +51,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Reservation::class)]
     private Collection $reservations;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $loyalty_points = null;
+
 
 
     public function __construct()
@@ -254,6 +257,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __toString(): string
     {
             return $this->email;
+    }
+
+    public function getLoyaltyPoints(): ?int
+    {
+        return $this->loyalty_points;
+    }
+
+    public function setLoyaltyPoints(?int $loyalty_points): self
+    {
+        $this->loyalty_points = $loyalty_points;
+
+        return $this;
     }
 
 
