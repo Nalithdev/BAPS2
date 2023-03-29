@@ -27,36 +27,35 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/api/private')]
 class SecuredRouteController extends AbstractController
 {
-	public User $user;
-	
-	/**
-	 * @throws Exception
-	 */
-	public function __construct(TokenAuthenticator $tokenAuthenticator, RequestStack $requestStack)
-	{
-		$request = $requestStack->getCurrentRequest();
+    public User $user;
 
-		$user = $tokenAuthenticator->getUser($request);
+    /**
+     * @throws Exception
+     */
+    public function __construct(TokenAuthenticator $tokenAuthenticator, RequestStack $requestStack)
+    {
+        $request = $requestStack->getCurrentRequest();
 
-		if(!$user) throw new UnauthorizedHttpException("Bearer", 'vous devez être connecté');
-		return $this->user = $user;
-	}
-	
-	// TOUTES LES ROUTES CI DESSOUS NÉCESSITERONT L'AJOUT D'UN TOKEN UTILISATEUR DANS LE HEADER DE LA REQUETE
+        $user = $tokenAuthenticator->getUser($request);
+
+        if (!$user) throw new UnauthorizedHttpException("Bearer", 'vous devez être connecté');
+        return $this->user = $user;
+    }
+
+    // TOUTES LES ROUTES CI DESSOUS NÉCESSITERONT L'AJOUT D'UN TOKEN UTILISATEUR DANS LE HEADER DE LA REQUETE
 
 
-    #[Route('/message', name:'app_SFeed', methods: ['POST'])]
-    public function SendFeed(Request $request,  ManagerRegistry $managerRegistry): Response
+    #[Route('/message', name: 'app_SFeed', methods: ['POST'])]
+    public function SendFeed(Request $request, ManagerRegistry $managerRegistry): Response
     {
         $title = $request->request->get('title');
         $description = $request->request->get('description');
         $id = $request->request->get('id');
 
         if (!$title || !$description) {
-            return $this->json(['success' => false , 'message' => 'Veuillez remplir tous les champs']);
+            return $this->json(['success' => false, 'message' => 'Veuillez remplir tous les champs']);
         }
-        $dates =  date('Y-m-d H:i:s');
-        ;
+        $dates = date('Y-m-d H:i:s');;
         $feed = new Feed();
         $feed->setTitle($title);
         $feed->setDescription($description);
@@ -67,17 +66,16 @@ class SecuredRouteController extends AbstractController
         $managerRegistry->getManager()->flush();
 
 
-        return $this->json(['success' => true , 'message' => 'Feed envoyer']);
+        return $this->json(['success' => true, 'message' => 'Feed envoyer']);
     }
 
 
-
-    #[Route('/message', name:'app_Feed' , methods: ['GET'])]
-    public function Feed(FeedRepository $feedRepository , UserRepository $userRepository, Request $request): JsonResponse
+    #[Route('/message', name: 'app_Feed', methods: ['GET'])]
+    public function Feed(FeedRepository $feedRepository, UserRepository $userRepository, Request $request): JsonResponse
     {
         $offset = $request->query->get('offset');
         $limit = $request->query->get('limit');
-        $criteria = new Criteria() ;
+        $criteria = new Criteria();
         $criteria->orderBy(['id' => 'DESC']);
         $criteria->setMaxResults($limit ?? 50);
         $criteria->setFirstResult($offset ?? 0);
@@ -88,15 +86,15 @@ class SecuredRouteController extends AbstractController
             $user = $userRepository->findOneBy(['id' => $f->getUser()]);
             $data[] = [
                 'id' => $f->getId(),
-                'url' => '/api/private/message/'.$f->getId(),
+                'url' => '/api/private/message/' . $f->getId(),
             ];
         }
 
-        return $this->json(['success' => true , 'data' => $data ]);
+        return $this->json(['success' => true, 'data' => $data]);
     }
 
-    #[Route('/message/{id}', name:'app_Feed_id' , methods: ['GET'])]
-    public function FeedId(FeedRepository $feedRepository , UserRepository $userRepository, $id , CommerceRepository $commerceRepository): JsonResponse
+    #[Route('/message/{id}', name: 'app_Feed_id', methods: ['GET'])]
+    public function FeedId(FeedRepository $feedRepository, UserRepository $userRepository, $id, CommerceRepository $commerceRepository): JsonResponse
     {
         $feed = $feedRepository->findOneBy(['id' => $id]);
         $user = $userRepository->findOneBy(['id' => $feed->getUser()]);
@@ -109,19 +107,19 @@ class SecuredRouteController extends AbstractController
             'shop' => [
                 'id' => $shop->getId(),
                 'name' => $shop->getName(),
-                'url' => '/api/private/shop/'.$shop->getId(),
+                'url' => '/api/private/shop/' . $shop->getId(),
             ],
             'date' => $feed->getCDate(),
         ];
 
-        return $this->json(['success' => true , 'data' => $data ]);
+        return $this->json(['success' => true, 'data' => $data]);
     }
 
-    #[Route('/shop', name:'app_DFeed' , methods: ['POST'])]
-    public function CreateShop(Request $request , ManagerRegistry $managerRegistry ): JsonResponse
+    #[Route('/shop', name: 'app_DFeed', methods: ['POST'])]
+    public function CreateShop(Request $request, ManagerRegistry $managerRegistry): JsonResponse
     {
         $user = $this->user;
-        if ($user->getRoles()[0] == 'ROLE_MERCHANT'){
+        if ($user->getRoles()[0] == 'ROLE_MERCHANT') {
             $shop = new Commerce();
             $shop->setName($request->request->get('name'));
             $shop->setDescription($request->request->get('description'));
@@ -129,51 +127,51 @@ class SecuredRouteController extends AbstractController
             $user->setCommerce($shop);
             $managerRegistry->getManager()->flush();
 
-            return $this->json(['success' => true , 'message' => 'Votre page Commerce a bien été créer']);
+            return $this->json(['success' => true, 'message' => 'Votre page Commerce a bien été créer']);
         }
-        return $this->json(['success' => false , 'message' => 'Vous n\'avez pas les droits pour accéder à cette page']);
+        return $this->json(['success' => false, 'message' => 'Vous n\'avez pas les droits pour accéder à cette page']);
     }
 
 
-    #[Route('/product', name:'app_product' , methods: ['POST'])]
-    public function product(ManagerRegistry $managerRegistry, Request $request , CommerceRepository $commerceRepository): Response
+    #[Route('/product', name: 'app_product', methods: ['POST'])]
+    public function product(ManagerRegistry $managerRegistry, Request $request, CommerceRepository $commerceRepository): Response
     {
         $user = $this->user;
-        if ($user->getRoles()[0] == 'ROLE_MERCHANT'){
+        if ($user->getRoles()[0] == 'ROLE_MERCHANT') {
 
             $commerce = $user->getCommerce();
             $shop = $commerceRepository->findOneBy(['id' => $commerce]);
 
 
-        $product = new Product();
-        $product->setName($request->request->get('name'));
-        $product->setDescription($request->request->get('description'));
-        $product->setPrice($request->request->get('price'));
-        $product->setStock($request->request->get('stock'));
-        $product->setShop($shop);
-        $managerRegistry->getManager()->persist($product);
-        $managerRegistry->getManager()->flush();
+            $product = new Product();
+            $product->setName($request->request->get('name'));
+            $product->setDescription($request->request->get('description'));
+            $product->setPrice($request->request->get('price'));
+            $product->setStock($request->request->get('stock'));
+            $product->setShop($shop);
+            $managerRegistry->getManager()->persist($product);
+            $managerRegistry->getManager()->flush();
 
-        return $this->json(['success' => true , 'message' => 'Produit envoyer', 'produit' => $product] );
+            return $this->json(['success' => true, 'message' => 'Produit envoyer', 'produit' => $product]);
         }
-        return $this->json(['success' => false , 'message' => 'Vous n\'avez pas les droits pour accéder à cette page' ] );
+        return $this->json(['success' => false, 'message' => 'Vous n\'avez pas les droits pour accéder à cette page']);
 
 
     }
 
     #[Route('/shop/{id}', name: 'app_product_id', methods: ['GET'])]
-    public function show(ProductRepository $productRepository , CommerceRepository $commerceRepository , $id ): Response
+    public function show(ProductRepository $productRepository, CommerceRepository $commerceRepository, $id): Response
     {
         $shop = $commerceRepository->findOneBy(['id' => $id]);
-        if ($shop == null){
-            return $this->json(['success' => false , 'message' => 'Ce commerce n\'existe pas' ] );
+        if ($shop == null) {
+            return $this->json(['success' => false, 'message' => 'Ce commerce n\'existe pas']);
         }
 
 
         $product = $productRepository->findBy(['shop' => $shop]);
         $Tshop = array();
         $Tmessage = array();
-        $Tshoop= array();
+        $Tshoop = array();
 
         $product_list = array();
 
@@ -212,10 +210,10 @@ class SecuredRouteController extends AbstractController
         ];
 
 
-        return $this->json(['success' => true , 'message' => 'Envoie du commerce et de leur produit au client', 'shop' => $Tshop] );
+        return $this->json(['success' => true, 'message' => 'Envoie du commerce et de leur produit au client', 'shop' => $Tshop]);
     }
 
-    #[Route('/user/{id}', name: 'user' , methods: ['GET'])]
+    #[Route('/user/{id}', name: 'user', methods: ['GET'])]
     public function user(UserRepository $userRepository, $id): Response
 
     {
@@ -232,13 +230,14 @@ class SecuredRouteController extends AbstractController
                 'role' => $users->getRoles()[0],
             ];
             return $this->json(['success' => true, 'users' => $data]);
-        }else{
+        } else {
             return $this->json(['success' => false, 'message' => 'Vous n\'avez pas les droits pour accéder à cette page']);
         }
 
     }
-    #[Route('/reserved/', name: 'reserved_post' , methods: ['POST'])]
-    public function Reserved(UserRepository $userRepository, Request $request , ManagerRegistry $managerRegistry): Response
+
+    #[Route('/reserved/', name: 'reserved_post', methods: ['POST'])]
+    public function Reserved(UserRepository $userRepository, Request $request, ManagerRegistry $managerRegistry): Response
 
     {
         $session = $this->user;
@@ -255,23 +254,23 @@ class SecuredRouteController extends AbstractController
 
     }
 
-    #[Route('/shop/{id}/reservations', name: 'reserved_get' , methods: ['GET'])]
+    #[Route('/shop/{id}/reservations', name: 'reserved_get', methods: ['GET'])]
     public function ReservedGet(Commerce $commerce): Response
 
     {
 
         $session = $this->user;
-        if ($session->getRoles()[0] == 'ROLE_MERCHANT'){
+        if ($session->getRoles()[0] == 'ROLE_MERCHANT') {
             $reservations = $commerce->getReservations();
 
             $data = array();
 
-            foreach ($reservations as $r){
+            foreach ($reservations as $r) {
 
                 $data[] = [
 
                     'id' => $r->getId(),
-                    'product' => $r->getProduct()->getId( ),
+                    'product' => $r->getProduct()->getId(),
                     'quantity' => $r->getQuantity(),
                     'date' => $r->getCdate(),
                 ];
@@ -283,9 +282,8 @@ class SecuredRouteController extends AbstractController
     }
 
 
-
-    #[Route('/shop/reservation/{id}/modify', name: 'modify_reservation' , methods: ['POST' , 'PUT'])]
-    public function pot_reserved( Request $request ,ReservationRepository $reservationRepository, $id, ManagerRegistry $managerRegistry): Response
+    #[Route('/shop/reservation/{id}/modify', name: 'modify_reservation', methods: ['POST', 'PUT'])]
+    public function pot_reserved(Request $request, ReservationRepository $reservationRepository, $id, ManagerRegistry $managerRegistry): Response
 
     {
         $session = $this->user;
@@ -304,9 +302,27 @@ class SecuredRouteController extends AbstractController
             return $this->json(['success' => true, 'message' => 'La reservation a bien été modifier']);
 
 
-        }else{
+        } else {
             return $this->json(['success' => false, 'message' => 'Vous ne pouvez plus modifier cette reservation']);
         }
 
+    }
+
+    #[Route('/reservation', name: 'get_reservation', methods: ['GET'])]
+    public function get_reserved(ReservationRepository $reservationRepository): Response
+
+    {
+        $data = array();
+        $session = $this->user;
+        $reservations = $reservationRepository->findBy(['user' => $session]);
+        foreach ($reservations as $r) {
+            $data[] = [
+                'id' => $r->getId(),
+                'product' => $r->getProduct()->getId(),
+                'quantity' => $r->getQuantity(),
+                'date' => $r->getCdate(),
+            ];
+        }
+        return $this->json(['success' => true, 'message' => 'Voici vos réservations', 'reservation' => $data]);
     }
 }
