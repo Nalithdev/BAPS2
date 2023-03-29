@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Commerce;
 use App\Entity\Feed;
 use App\Entity\Product;
+use App\Entity\Reservation;
 use App\Entity\User;
 use App\Repository\CommerceRepository;
 use App\Repository\FeedRepository;
@@ -169,34 +170,48 @@ class SecuredRouteController extends AbstractController
 
 
         $product = $productRepository->findBy(['shop' => $shop]);
-            $Tshop = array();
-            $Tmessage = array();
-            $Tshoop= array();
+        $Tshop = array();
+        $Tmessage = array();
+        $Tshoop= array();
 
+        $product_list = array();
 
+        foreach ($product as $p) {
+            $product_list[] = [
+                'id' => $p->getId(),
+                'name' => $p->getName(),
+                'description' => $p->getDescription(),
+                'price' => $p->getPrice(),
+                'stock' => $p->getStock(),
+            ];
+        }
+
+        /*
         $Tshoop['shop']['id'] = $shop->getId();
         $Tshoop['shop']['name'] = $shop->getName();
         $Tshoop['shop']['description'] = $shop->getDescription();
-
+        array_push($Tshop, $Tshoop);
             foreach ( $product as $f) {
-                $Tmessage[] =[
+                $Tmessage['product'] =[
                     'id' => $f->getId(),
                 'title' => $f->getName(),
                 'Description' => $f->getDescription(),
                 'Price' => $f->getPrice(),
                 'Stock' => $f->getStock(),
                 ];
-
-
-
-
-
-
-
+                array_push($Tshop, $Tmessage);
             }
+        */
+
+        $Tshop = [
+            'id' => $shop->getId(),
+            'name' => $shop->getName(),
+            'description' => $shop->getDescription(),
+            'product' => $product_list,
+        ];
 
 
-        return $this->json(['success' => true , 'message' => 'Envoie du commerce et de leur produit au client', 'shop' => $Tshoop, 'product' => $Tmessage ] );
+        return $this->json(['success' => true , 'message' => 'Envoie du commerce et de leur produit au client', 'shop' => $Tshop] );
     }
 
     #[Route('/user/{id}', name: 'user' , methods: ['GET'])]
@@ -221,6 +236,46 @@ class SecuredRouteController extends AbstractController
         }
 
     }
+    #[Route('/reserved/', name: 'reserved_post' , methods: ['POST'])]
+    public function Reserved(UserRepository $userRepository, Request $request , ManagerRegistry $managerRegistry): Response
 
+    {
+        $session = $this->user;
+        $reservation = new Reservation();
+        $reservation->setUser($session);
+        $reservation->setProduct($request->request->get('product'));
+        $reservation->setQuantity($request->request->get('quantity'));
+        $reservation->setCdate(new \DateTime());
+        $managerRegistry->getManager()->persist($reservation);
+        $managerRegistry->getManager()->flush();
 
+        return $this->json(['success' => true, 'message' => 'Votre réservation a bien été prise en compte']);
+
+    }
+
+    #[Route('/shop/{id}/reservations', name: 'reserved_get' , methods: ['GET'])]
+    public function ReservedGet(Commerce $commerce): Response
+
+    {
+
+        $session = $this->user;
+        if ($session->getRoles()[0] == 'ROLE_MERCHANT'){
+            $reservations = $commerce->getReservations();
+
+            $data = array();
+
+            foreach ($reservations as $r){
+                $data[] = [
+
+                    'id' => $r->getId(),
+                    'product' => $r->getProduct()->getId(),
+                    'quantity' => $r->getQuantity(),
+                    'date' => $r->getCdate(),
+                ];
+            }
+
+            return $this->json(['success' => true, 'message' => 'Voici les réservations de vos clients', 'reservation' => $data]);
+        }
+        return $this->json(['success' => false, 'message' => 'Vous n\'avez pas les droits pour accéder à cette page']);
+    }
 }

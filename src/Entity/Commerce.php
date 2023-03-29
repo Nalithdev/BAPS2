@@ -117,6 +117,21 @@ class Commerce
         return $this;
     }
 
+    public function getReservations(): array
+    {
+        $reservations = [];
+        foreach ($this->getProducts() as $product) {
+            $p_reservations = $product->getReservations();
+            if($p_reservations->count() > 0){
+                foreach ($p_reservations as $reservation) {
+                    $reservations[] = $reservation;
+                }
+            }
+
+        }
+        return $reservations;
+    }
+
 
 
 }
