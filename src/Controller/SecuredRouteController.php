@@ -288,10 +288,9 @@ class SecuredRouteController extends AbstractController
     {
         $session = $this->user;
         $shop_reservation_id = $reservationRepository->findOneBy(['id' => $id]);
-        $user = $shop_reservation_id->getUser();
 
         if ($session->getRoles()[0] == 'ROLE_MERCHANT') {
-            $shop_reservation_id->setProduct($request->request->get(''));
+            $shop_reservation_id->set($request->request->get(''));
             $this->getProduct()->getManager()->flush();
             return $this->json(['success' => true, 'message' => 'La reservation a bien été modifier']);
 
