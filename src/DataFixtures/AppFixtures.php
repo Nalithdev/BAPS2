@@ -115,26 +115,29 @@ class AppFixtures extends Fixture
             $reservation->setUser($user);
             $reservation->setProduct($product[rand(0, count($product) - 1)]);
             $reservation->setQuantity(rand(1, 100));
+            date_default_timezone_set('Europe/Paris');
             $date = new \DateTime();
+            $reservation->setStatus('in waiting');
 
             $reservation->setCDate($date);
             $manager->persist($reservation);
         }
         $manager->flush();
 
-        $productRepository = $manager->getRepository(Product::class);
+       /* $productRepository = $manager->getRepository(Product::class);
         $product = $productRepository->findAll();
             $reservation2 = new Reservation();
             $reservation2->setUser($user);
             $reservation2->setProduct($product[rand(0, count($product) - 1)]);
             $reservation2->setQuantity(rand(1, 100));
             $reservation2->setStatus('reserved');
-            $date = new \DateTime('2023-03-28 12:00:00');
+            date_default_timezone_set('Europe/Paris');
+            $date = new \DateTime();
 
             $reservation2->setCDate($date);
             $manager->persist($reservation2);
 
-        $manager->flush();
+        $manager->flush();*/
 
 
 
