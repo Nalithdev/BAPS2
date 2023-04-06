@@ -151,7 +151,7 @@ class AppController extends AbstractController
                     'firstname' => $user->getFirstname(),
                     'lastname' => $user->getLastname(),
                     'email' => $user->getEmail(),
-                    'url' => '/api/private/user/'.$user->getId(),
+                    'url' => '/api/user/'.$user->getId(),
 
                 ];
             }
