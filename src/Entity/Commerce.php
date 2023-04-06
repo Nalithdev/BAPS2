@@ -30,6 +30,9 @@ class Commerce
     #[ORM\OneToMany(mappedBy: 'shop', targetEntity: Product::class)]
     private Collection $products;
 
+    #[ORM\Column(length: 255)]
+    private ?string $adresse = null;
+
     public function __construct()
     {
         $this->feeds = new ArrayCollection();
@@ -130,6 +133,18 @@ class Commerce
 
         }
         return $reservations;
+    }
+
+    public function getAdresse(): ?string
+    {
+        return $this->adresse;
+    }
+
+    public function setAdresse(string $adresse): self
+    {
+        $this->adresse = $adresse;
+
+        return $this;
     }
 
 
