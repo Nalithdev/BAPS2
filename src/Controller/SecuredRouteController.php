@@ -240,8 +240,8 @@ class SecuredRouteController extends AbstractController
 
     }
 
-    #[Route('/point/add/{id}', name: 'reserved_delete', methods: ['POST'])]
-    public function PointAdd(UserRepository $userRepository, ManagerRegistry $managerRegistry): Response
+    #[Route('/point/add/{id}', name: 'point_add', methods: ['POST'])]
+    public function AddPoint(UserRepository $userRepository, ManagerRegistry $managerRegistry): Response
     {
         $session = $this->user;
         $user = $userRepository->findOneBy(['id' => $session->getId()]);
@@ -251,6 +251,33 @@ class SecuredRouteController extends AbstractController
             'points de fidélité' => $user->getLoyaltyPoints(),
         ];
 
+        return $this->json(['success' => true, 'message' => '', 'reservation' => $data]);
+
+
+
+
+    }
+
+    #[Route('/point/delete/{id}', name: 'point_delete', methods: ['POST'])]
+    public function DeletePoint(UserRepository $userRepository, ManagerRegistry $managerRegistry): Response
+    {
+        $session = $this->user;
+        $user = $userRepository->findOneBy(['id' => $session->getId()]);
+        $delete = $user->getLoyaltyPoints();
+        $delete -= 1;
+        if ($delete < 0)
+        {
+            $user->setLoyaltyPoints(0);
+        }
+        else
+        {
+            $user->setLoyaltyPoints($delete);
+        }
+
+        $data = [
+            'points de fidélité' => $user->getLoyaltyPoints(),
+        ];
+        $managerRegistry->getManager()->persist($user);
         return $this->json(['success' => true, 'message' => '', 'reservation' => $data]);
 
 
