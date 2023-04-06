@@ -144,7 +144,6 @@ class AppController extends AbstractController
         foreach ($users as $user) {
             if($user->getRoles()[0] == 'ROLE_MERCHANT' || $user->getRoles()[0] == 'ROLE_ADMIN'){
 
-
             }
             else{
                 $data[] = [

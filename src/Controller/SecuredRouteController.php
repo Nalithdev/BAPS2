@@ -87,7 +87,7 @@ class SecuredRouteController extends AbstractController
             $user = $userRepository->findOneBy(['id' => $f->getUser()]);
             $data[] = [
                 'id' => $f->getId(),
-                'url' => '/api/private/message/' . $f->getId(),
+                'url' => '/api/message/' . $f->getId(),
             ];
         }
 
@@ -108,7 +108,7 @@ class SecuredRouteController extends AbstractController
             'shop' => [
                 'id' => $shop->getId(),
                 'name' => $shop->getName(),
-                'url' => '/api/private/shop/' . $shop->getId(),
+                'url' => '/api/shop/' . $shop->getId(),
             ],
             'date' => $feed->getCDate(),
         ];
@@ -207,14 +207,14 @@ class SecuredRouteController extends AbstractController
         $users = $userRepository->findOneBy(['id' => $id]);
 
         if ($session->getRoles()[0] == 'ROLE_ADMIN' || $session->getId() == $users->getId()) {
-            $data[] = [
+            $data = [
                 'id' => $users->getId(),
                 'firstname' => $users->getFirstname(),
                 'lastname' => $users->getLastname(),
                 'email' => $users->getEmail(),
                 'role' => $users->getRoles()[0],
             ];
-            return $this->json(['success' => true, 'users' => $data]);
+            return $this->json(['success' => true, 'user' => $data]);
         } else {
             return $this->json(['success' => false, 'message' => 'Vous n\'avez pas les droits pour accéder à cette page']);
         }
