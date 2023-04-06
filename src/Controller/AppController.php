@@ -113,7 +113,7 @@ class AppController extends AbstractController
         $Mytoken = $tokenRepository->findOneBy(['user_id' => $id]);
 
         if ($Mytoken) {
-            return $this->json  (['header' => ['code' => 200 , 'message' => 'Vous êtes connectés et votre token existe déja'] ,'token' => $Mytoken , 'id' => $id, 'role' => $role[0]]);
+            return $this->json  (["success" => true ,'token' => $Mytoken , 'id' => $id, 'role' => $role[0]]);
         }
         //bonjour
 
@@ -127,7 +127,7 @@ class AppController extends AbstractController
 
 
 
-        return $this->json  (['header' => ['code' => 200 , 'message' => 'Vous êtes connectés'] ,'token' => $Stoken , 'id' => $id, 'role' => $role[0]]);
+        return $this->json  (["success" => true ,'token' => $Stoken , 'id' => $id, 'role' => $role[0]]);
 
     }
 
