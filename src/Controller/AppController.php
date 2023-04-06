@@ -33,12 +33,14 @@ class AppController extends AbstractController
     #[Route('/login', name:'app_auth', methods: ['POST'])]
     public function auth(Request $request, UserRepository $userRepository,UserPasswordHasherInterface $passwordHasher ): Response
     {
-        $email = $request->request->get('email');
+        $form = $request->toArray();
+        $email = $form ['email'];
+
         $user = $userRepository->findOneBy(['email' => $email]);
 
         $session = $request->getSession();
         if ($user) {
-            $password = $request->request->get('password');
+            $password = $form['password'];
             if ($user->getPassword() == $passwordHasher->isPasswordValid($user, $password)) {
                 $session->set('user', $user->getEmail());
                 $this->addFlash('success', 'Vous êtes connecté');
@@ -61,13 +63,13 @@ class AppController extends AbstractController
     #[Route('/register', name: 'app_register')]
     public function register(Request $request, ManagerRegistry $managerRegistry, UserPasswordHasherInterface $passwordHasher): Response
     {
+        $form = $request->toArray();
 
-
-        $firstname = $request->request->get('firstname');
-        $lastname = $request->request->get('lastname');
-        $email = $request->request->get('email');
-        $password = $request->request->get('password');
-        $action = $request->request->get('action');
+        $firstname = $form['firstname'];
+        $lastname = $form['lastname'];
+        $email = $form['email'];
+        $password = $form['password'];
+        $action = $form['action'];
         $Nuser = new User();
         if ($firstname != null && $lastname != null && $email != null && $password != null) {
             $Nuser->setFirstname($firstname);
