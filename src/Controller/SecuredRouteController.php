@@ -49,9 +49,10 @@ class SecuredRouteController extends AbstractController
     #[Route('/message', name: 'app_SFeed', methods: ['POST'])]
     public function SendFeed(Request $request, ManagerRegistry $managerRegistry): Response
     {
-        $title = $request->request->get('title');
-        $description = $request->request->get('description');
-        $id = $request->request->get('id');
+        $feed = $request->toArray();
+        $title = $feed['title'];
+        $description = $feed['description'];
+        $id = $feed['id'];
 
         if (!$title || !$description) {
             return $this->json(['success' => false, 'message' => 'Veuillez remplir tous les champs']);
@@ -121,9 +122,11 @@ class SecuredRouteController extends AbstractController
     {
         $user = $this->user;
         if ($user->getRoles()[0] == 'ROLE_MERCHANT') {
+            $merchant = $request->toArray();
+
             $shop = new Commerce();
-            $shop->setName($request->request->get('name'));
-            $shop->setDescription($request->request->get('description'));
+            $shop->setName($merchant['name']);
+            $shop->setDescription($merchant['description']);
             $managerRegistry->getManager()->persist($shop);
             $user->setCommerce($shop);
             $managerRegistry->getManager()->flush();
@@ -142,13 +145,12 @@ class SecuredRouteController extends AbstractController
 
             $commerce = $user->getCommerce();
             $shop = $commerceRepository->findOneBy(['id' => $commerce]);
-
-
+            $product = $request->toArray();
             $product = new Product();
-            $product->setName($request->request->get('name'));
-            $product->setDescription($request->request->get('description'));
-            $product->setPrice($request->request->get('price'));
-            $product->setStock($request->request->get('stock'));
+            $product->setName($product['name']);
+            $product->setDescription($product['description']);
+            $product->setPrice($product['price']);
+            $product->setStock($product['stock']);
             $product->setShop($shop);
             $managerRegistry->getManager()->persist($product);
             $managerRegistry->getManager()->flush();
@@ -240,12 +242,13 @@ class SecuredRouteController extends AbstractController
 
     }
 
-    #[Route('/point/add/{id}', name: 'point_add', methods: ['POST'])]
-    public function AddPoint(UserRepository $userRepository, ManagerRegistry $managerRegistry): Response
+    #[Route('/point/{id}/add', name: 'point_add', methods: ['POST'])]
+    public function AddPoint(UserRepository $userRepository, ManagerRegistry $managerRegistry, Request $request): Response
     {
         $session = $this->user;
+        $points = $request->toArray();
         $user = $userRepository->findOneBy(['id' => $session->getId()]);
-        $user->setLoyaltyPoints($user->getLoyaltyPoints() + 1);
+        $user->setLoyaltyPoints($user->getLoyaltyPoints() + $points['points']);
 
         $data = [
             'points de fidélité' => $user->getLoyaltyPoints(),
@@ -258,30 +261,22 @@ class SecuredRouteController extends AbstractController
 
     }
 
-    #[Route('/point/delete/{id}', name: 'point_delete', methods: ['POST'])]
-    public function DeletePoint(UserRepository $userRepository, ManagerRegistry $managerRegistry): Response
+    #[Route('/point/{id}/remove', name: 'point_delete', methods: ['POST'])]
+    public function DeletePoint(UserRepository $userRepository, ManagerRegistry $managerRegistry, Request $request): Response
     {
         $session = $this->user;
         $user = $userRepository->findOneBy(['id' => $session->getId()]);
-        $delete = $user->getLoyaltyPoints();
-        $delete -= 1;
-        if ($delete < 0)
-        {
-            $user->setLoyaltyPoints(0);
-        }
-        else
-        {
-            $user->setLoyaltyPoints($delete);
-        }
-
+        $points = $request->toArray();
+        $point = intval($points['points']);
+        $Fpoint = $user->getLoyaltyPoints() - $point;
+        if ($Fpoint < 0) $Fpoint = 0;
+        $user->setLoyaltyPoints($Fpoint);
+        $managerRegistry->getManager()->persist($user);
+        $managerRegistry->getManager()->flush();
         $data = [
             'points de fidélité' => $user->getLoyaltyPoints(),
         ];
-        $managerRegistry->getManager()->persist($user);
-        return $this->json(['success' => true, 'message' => '', 'reservation' => $data]);
-
-
-
+        return $this->json(['success' => true, 'amounts' => $data]);
 
     }
 
