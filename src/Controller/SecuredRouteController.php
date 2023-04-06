@@ -87,7 +87,7 @@ class SecuredRouteController extends AbstractController
             $user = $userRepository->findOneBy(['id' => $f->getUser()]);
             $data[] = [
                 'id' => $f->getId(),
-                'url' => '/api/private/message/' . $f->getId(),
+                'url' => '/api/message/' . $f->getId(),
             ];
         }
 
@@ -108,7 +108,7 @@ class SecuredRouteController extends AbstractController
             'shop' => [
                 'id' => $shop->getId(),
                 'name' => $shop->getName(),
-                'url' => '/api/private/shop/' . $shop->getId(),
+                'url' => '/api/shop/' . $shop->getId(),
             ],
             'date' => $feed->getCDate(),
         ];
