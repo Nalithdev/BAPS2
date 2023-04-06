@@ -231,6 +231,7 @@ class SecuredRouteController extends AbstractController
         $reservation->setProduct($request->request->get('product'));
         $reservation->setQuantity($request->request->get('quantity'));
         $reservation->setCdate(new \DateTime());
+        $reservation->setStatus('In waiting');
         $managerRegistry->getManager()->persist($reservation);
         $managerRegistry->getManager()->flush();
 
@@ -286,6 +287,7 @@ class SecuredRouteController extends AbstractController
             if ($status)
             {
                 $shop_reservation_id->setStatus($status);
+                date_default_timezone_set('Europe/Paris');
                 $date = new \DateTime();
 
                 $shop_reservation_id->setCdate($date);
