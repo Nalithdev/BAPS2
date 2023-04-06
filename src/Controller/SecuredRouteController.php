@@ -240,6 +240,24 @@ class SecuredRouteController extends AbstractController
 
     }
 
+    #[Route('/point/add/{id}', name: 'reserved_delete', methods: ['POST'])]
+    public function PointAdd(UserRepository $userRepository, ManagerRegistry $managerRegistry): Response
+    {
+        $session = $this->user;
+        $user = $userRepository->findOneBy(['id' => $session->getId()]);
+        $user->setLoyaltyPoints($user->getLoyaltyPoints() + 1);
+
+        $data = [
+            'points de fidélité' => $user->getLoyaltyPoints(),
+        ];
+
+        return $this->json(['success' => true, 'message' => '', 'reservation' => $data]);
+
+
+
+
+    }
+
     #[Route('/shop/{id}/reservations', name: 'reserved_get', methods: ['GET'])]
     public function ReservedGet(Commerce $commerce, ManagerRegistry $managerRegistry): Response
 
@@ -248,7 +266,6 @@ class SecuredRouteController extends AbstractController
         $session = $this->user;
         if ($session->getRoles()[0] == 'ROLE_MERCHANT') {
             $reservations = $commerce->getReservations();
-
             $data = array();
 
             foreach ($reservations as $r) {

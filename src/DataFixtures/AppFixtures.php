@@ -26,7 +26,6 @@ class AppFixtures extends Fixture
 		$user->setFirstname('Francis');
 		$user->setLastname('Bertrand');
         $user->setLoyaltyPoints(0);
-		
 		$user->setRoles(['ROLE_USER']);
 		
 		$manager->persist($user);
@@ -55,9 +54,7 @@ class AppFixtures extends Fixture
 		$merchant->setLastname('Lafont');
 		$merchant->setSiren('123456789');
 		$merchant->setApproved(false);
-		$merchant->setLoyaltyPoints(100);
 		$merchant->setRoles(['ROLE_MERCHANT']);
-		
 		$manager->persist($merchant);
 		
 		$manager->flush();
@@ -69,7 +66,7 @@ class AppFixtures extends Fixture
             $shop= new Commerce();
             $shop->setName($merchant->getFirstname() . ' ' . $merchant->getLastname());
             $shop->setDescription('description du commerce');
-
+            $shop->setAdresse('Rue du commerce');
             $manager->persist($shop);
             $merchant->setCommerce($shop);
 
