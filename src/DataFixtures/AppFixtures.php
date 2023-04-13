@@ -66,7 +66,7 @@ class AppFixtures extends Fixture
             $shop= new Commerce();
             $shop->setName($merchant->getFirstname() . ' ' . $merchant->getLastname());
             $shop->setDescription('description du commerce');
-            $shop->setAdresse('Rue du commerce');
+            $shop->setAdresse('adresse du commerce');
             $manager->persist($shop);
             $merchant->setCommerce($shop);
 
