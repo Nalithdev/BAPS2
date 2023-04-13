@@ -263,6 +263,30 @@ class SecuredRouteController extends AbstractController
         return $this->json(['success' => true, 'message' => 'Votre réservation a bien été prise en compte']);
 
     }
+    #[Route('/getuser/{token}', name: 'reserved_get', methods: ['GET'])]
+    public function GetTUser($token , TokenRepository $tokenRepository , UserRepository $userRepository): Response
+
+    {
+        $session = $this->user;
+        $token = $tokenRepository->findOneBy(['token_id' => $token]);
+        if ($session->getRoles()[0] == 'ROLE_MERCHANT') {
+            $user_id = $token->getUserId();
+            $user= $userRepository->findOneBy(['id' => $user_id]);
+            $data = [
+                'id' => $user->getId(),
+                'firstname' => $user->getFirstname(),
+                'lastname' => $user->getLastname(),
+                'email' => $user->getEmail()
+            ];
+
+
+            return $this->json(['success' => true, 'message' => 'Envoie des réservations au client', 'user' => $data]);
+        }
+        else {
+            return $this->json(['success' => false, 'message' => 'Vous n\'avez pas les droits pour accéder à cette page']);
+        }
+
+    }
 
     #[Route('/point/{id}/add', name: 'point_add', methods: ['POST'])]
     public function AddPoint(UserRepository $userRepository, ManagerRegistry $managerRegistry, Request $request): Response
