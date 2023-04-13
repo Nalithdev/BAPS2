@@ -162,6 +162,26 @@ class SecuredRouteController extends AbstractController
 
 
     }
+    #[Route('/product/{id}/modify', name: 'app_product', methods: ['POST'])]
+    public function Mproduct(ManagerRegistry $managerRegistry, Request $request, ProductRepository $productRepository): Response
+    {
+        $user = $this->user;
+        if ($user->getRoles()[0] == 'ROLE_MERCHANT') {
+
+            $commerce = $user->getCommerce();
+            $products = $productRepository->findOneBy(['id' => $commerce]);
+            $product = $request->toArray();
+            $products->setStock($product['stock']);
+
+            $managerRegistry->getManager()->persist($products);
+            $managerRegistry->getManager()->flush();
+
+            return $this->json(['success' => true, 'message' => 'Produit modifier',]);
+        }
+        return $this->json(['success' => false, 'message' => 'Vous n\'avez pas les droits pour accéder à cette page']);
+
+
+    }
 
     #[Route('/shop/{id}', name: 'app_product_id', methods: ['GET'])]
     public function show(ProductRepository $productRepository, CommerceRepository $commerceRepository, $id): Response
@@ -241,6 +261,30 @@ class SecuredRouteController extends AbstractController
 
 
         return $this->json(['success' => true, 'message' => 'Votre réservation a bien été prise en compte']);
+
+    }
+    #[Route('/getuser/{token}', name: 'reserved_get', methods: ['GET'])]
+    public function GetTUser($token , TokenRepository $tokenRepository , UserRepository $userRepository): Response
+
+    {
+        $session = $this->user;
+        $token = $tokenRepository->findOneBy(['token_id' => $token]);
+        if ($session->getRoles()[0] == 'ROLE_MERCHANT') {
+            $user_id = $token->getUserId();
+            $user= $userRepository->findOneBy(['id' => $user_id]);
+            $data = [
+                'id' => $user->getId(),
+                'firstname' => $user->getFirstname(),
+                'lastname' => $user->getLastname(),
+                'email' => $user->getEmail()
+            ];
+
+
+            return $this->json(['success' => true, 'message' => 'Envoie des réservations au client', 'user' => $data]);
+        }
+        else {
+            return $this->json(['success' => false, 'message' => 'Vous n\'avez pas les droits pour accéder à cette page']);
+        }
 
     }
 
@@ -356,15 +400,12 @@ class SecuredRouteController extends AbstractController
         $session = $this->user;
 
         $shop_reservation_id = $reservationRepository->findOneBy(['id' => $id]);
-        if ($session->getRoles()[0] == 'ROLE_MERCHANT') {
             $managerRegistry->getManager()->remove($shop_reservation_id);
             $managerRegistry->getManager()->flush();
 
             return $this->json(['success' => true, 'message' => 'La reservation a bien été supprimer']);
 
-        }else{
-            return $this->json(['success' => false, 'message' => 'Vous ne pouvez plus supprimer cette reservation']);
-        }
+
 
     }
 
@@ -407,4 +448,26 @@ class SecuredRouteController extends AbstractController
 
         return $this->json(['success' => true, 'message' => 'Vous êtes déconnecté']);
     }
+
+    #[Route('/map', name: 'map' , methods: ['GET'])]
+    public function map(Request $request, ManagerRegistry $managerRegistry, TokenRepository $tokenRepository , CommerceRepository $commerceRepository): Response
+    {
+        $adresse = $commerceRepository->findAll();
+        $data = array();
+        foreach ($adresse as $a)
+        {
+            $data[] = [
+                'id' => $a->getId(),
+                'address' => $a->getAdresse()
+
+            ];
+        }
+
+
+
+
+        return $this->json(['success' => true, 'adresse' => $data]);
+    }
+
+
 }
