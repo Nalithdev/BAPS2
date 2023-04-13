@@ -98,10 +98,6 @@ class AppController extends AbstractController
             return new JsonResponse(['success' => false, 'message' => 'Vous devez renseigner tous les champs']);
         }
 
-
-
-
-
     }
     #[Route('/auth1/{id}', name: 'app_auth1')]
     public function auth1(Request $request, UserRepository $userRepository, $id, ManagerRegistry $managerRegistry, TokenGeneratorInterface $tokenGenerator, TokenRepository $tokenRepository ): JsonResponse
