@@ -80,7 +80,7 @@ class AppController extends AbstractController
                 if ($request->request->get('siren') != null) {
 
                     $Nuser->setRoles(['ROLE_MERCHANT']);
-                    $Nuser->setSiren($request->request->get('siren'));
+                    $Nuser->setSiren($form['siren']);
                     $Nuser->setApproved(false);
                     $Nuser->setLoyaltyPoints(0);
                 } else {
