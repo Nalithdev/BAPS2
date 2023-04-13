@@ -127,6 +127,7 @@ class SecuredRouteController extends AbstractController
             $shop = new Commerce();
             $shop->setName($merchant['name']);
             $shop->setDescription($merchant['description']);
+            $shop->setAdresse($merchant['address']);
             $managerRegistry->getManager()->persist($shop);
             $user->setCommerce($shop);
             $managerRegistry->getManager()->flush();
@@ -194,6 +195,7 @@ class SecuredRouteController extends AbstractController
             'name' => $shop->getName(),
             'description' => $shop->getDescription(),
             'product' => $product_list,
+            'adresse' => $shop->getAdresse(),
         ];
 
 
