@@ -12,33 +12,42 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class CategoryController extends AbstractController
 {
-    #[Route('/admin/categories', name: 'app_categories')]
+    #[Route('/api/categories', name: 'app_categories', methods: ['GET', 'POST'])]
     public function categories(CategoryRepository $categoryRepository): Response
     {
         $categories = $categoryRepository->findAll();
+        foreach ($categories as $c) {
 
-        return $this->json(['success' => false, 'message' => 'Vous pouvez consulter les catégories', 'categories' => $categories]);
+            $datas = [
+
+                'categories' => $c,
+                'url' => '/api/categories/' . $c->getId(),
+
+            ];
+
+        }
+
+
+        return $this->json(['success' => true, 'message' => 'Vous pouvez consulter les catégories', 'categories' => $datas]);
 
 
     }
 
-    #[Route('/admin/categories/add', name: 'app_categories')]
-    public function addcategories(ManagerRegistry $managerRegistry): Response
+    #[Route('/api/categories/{id}', name: 'app_categories_id', methods: ['GET', 'POST'])]
+    public function categoriesId(CategoryRepository $categoryRepository, $id): Response
     {
-        $categories = new Category();
-        $categories->setName('test');
-        $categories->setDescription('description test');
+        $category = $categoryRepository->find($id);
 
+        foreach ($category as $cy) {
 
-        $data = [
-            'Nom de la categorie' => $categories->getName(),
-        ];
+            $data = [
 
-        $managerRegistry->getManager()->persist($data);
-        $managerRegistry->getManager()->flush();
+                'id' => $cy->getId(),
+                'name' => $cy->getName(),
+                'description' => $cy->getDescription(),
 
-        return $this->json(['success' => false, 'message' => 'Vous pouvez consulter les catégories', 'categories' => $data]);
+            ];
 
-
-    }
+        }
+        return $this->json(['success' => true, 'message' => 'Vous pouvez consulter les catégories', 'categories' => $data]);    }
 }
