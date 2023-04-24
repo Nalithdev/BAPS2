@@ -24,6 +24,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/api')]
@@ -527,6 +528,102 @@ class SecuredRouteController extends AbstractController
 
 
     }
+    //modifié l'utilisateur
+    #[Route('/user/{id}/modify', name: 'modify_user', methods: ['PUT', 'POST'])]
+    public function UModify(UserRepository $userRepository, ManagerRegistry $managerRegistry, Request $request, UserPasswordHasherInterface $passwordHasher): Response
+    {
+
+        $session = $this->user;
+        $user = $userRepository->findOneBy(array('id' =>$session->getId()));
+        if ($user){
+            $form = $request->toArray();
+
+            if ($form['email'] == null){
+                $form['email'] = $user->getEmail();
+
+            }
+            if ($form['lastname'] == null){
+                $form['lastname'] = $user->getLastname();
+
+            }
+            if ($form['firstname'] == null){
+                $form['firstname'] = $user->getFirstname();
+
+            }
+
+            $user->setEmail($form['email']);
+            $user->setLastname($form['lastname']);
+            $user->setFirstname($form['firstname']);
+            $managerRegistry->getManager()->persist($user);
+            $managerRegistry->getManager()->flush();
+
+
+
+
+
+            return $this->json(['success' => true, 'message' => 'Vous avez modifié votre profile']);
+
+        }
+        return $this->json(['success' => false, 'message' => 'Vous n\'êtes pas l\'user lié à ce compte']);
+
+
+
+    }
+
+    #[Route('/user/{id}/MDPmodify', name: 'modify_user', methods: ['PUT', 'POST'])]
+    public function ModifyMDP(UserRepository $userRepository, ManagerRegistry $managerRegistry, Request $request, UserPasswordHasherInterface $passwordHasher): Response
+    {
+
+        $session = $this->user;
+        $user = $userRepository->findOneBy(array('id' =>$session->getId()));
+        $form = $request->toArray();
+        if ($user && $form['password']){
+
+            $user->setPassword($passwordHasher->hashPassword($user, $form['password']));
+
+            $managerRegistry->getManager()->persist($user);
+            $managerRegistry->getManager()->flush();
+
+
+
+
+
+            return $this->json(['success' => true, 'message' => 'Vous avez modifié votre profile']);
+
+        }
+        return $this->json(['success' => false, 'message' => 'Vous n\'êtes pas l\'user lié à ce compte']);
+
+
+
+    }
+
+    #[Route('/shops', name: 'modify_user', methods: ['GET'])]
+    public function GShops(CommerceRepository $commerceRepository): Response
+    {
+
+        $session = $this->user;
+        $commerce = $commerceRepository->findAll();
+        $data = array();
+        foreach ($commerce as $c)
+        {
+            $data[] =
+                [
+                    'id' => $c->getId(),
+                    'name' => $c->getName(),
+                    'description' => $c->getDescription(),
+                    'adresse' => $c->getAdresse(),
+                ];
+
+        }
+        return $this->json(['success' => true, 'message' => 'Vous pouvez consulter les commerces', 'commerces' => $data]);
+
+
+
+
+    }
+
+
+
 
 
 }
