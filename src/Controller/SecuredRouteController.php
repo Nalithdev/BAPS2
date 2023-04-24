@@ -7,6 +7,7 @@ use App\Entity\Feed;
 use App\Entity\Product;
 use App\Entity\Reservation;
 use App\Entity\User;
+use App\Repository\CategoryRepository;
 use App\Repository\CommerceRepository;
 use App\Repository\FeedRepository;
 use App\Repository\ProductRepository;
@@ -467,6 +468,57 @@ class SecuredRouteController extends AbstractController
 
 
         return $this->json(['success' => true, 'adresse' => $data]);
+    }
+
+   #[Route('/categories', name: 'app_categories', methods: ['GET'])]
+    public function categories(CategoryRepository $categoryRepository): Response
+    {
+        $categories = $categoryRepository->findAll();
+        $session = $this->user;
+
+        if($session->getRoles()[0] == 'ROLE_ADMIN'){
+
+            foreach ($categories as $c) {
+
+                $datas = [
+
+                    'categories' => $c,
+                    'url' => '/api/categories/' . $c->getId(),
+
+                ];
+
+            }
+
+
+        }
+
+        return $this->json(['success' => true, 'message' => 'Vous pouvez consulter les catégories', 'categories' => $datas]);
+
+
+    }
+
+    #[Route('/categories/{id}', name: 'app_categories_id', methods: ['GET'])]
+    public function categoriesId(CategoryRepository $categoryRepository, $id): Response
+    {
+        $category = $categoryRepository->find($id);
+        $session = $this->user;
+        if($session->getRoles()[0] == 'ROLE_ADMIN'){
+
+            foreach ($category as $cy) {
+
+                $data = [
+
+                    'id' => $cy->getId(),
+                    'name' => $cy->getName(),
+                    'description' => $cy->getDescription(),
+
+                ];
+
+            }
+        }
+
+        return $this->json(['success' => true, 'message' => 'Vous pouvez consulter les catégories', 'categories' => $data]);
+
     }
 
 
