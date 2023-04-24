@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Category;
 use App\Entity\Commerce;
 use App\Entity\Feed;
 use App\Entity\Product;
@@ -138,12 +139,17 @@ class AppFixtures extends Fixture
         $manager->flush();*/
 
 
+        //Creer des categories
 
-//Créer des reservations
-        //recuperer l'user avec le role merchant
+        for($i = 1; $i <= 30; $i++){
+        $category= new Category();
+        $category->setName('category ' . $i);
+        $category->setDescription('description de la category ' . $i);
 
+        $manager->persist($category);
+        }
 
-
+        $manager->flush();
 
     }
 

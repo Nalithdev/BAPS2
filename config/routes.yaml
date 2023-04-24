@@ -3,3 +3,20 @@ controllers:
         path: ../src/Controller/
         namespace: App\Controller
     type: attribute
+
+admin_category:
+    path: '/admin/categories'
+    controller: App\Controller\Admin\CategoryController::index'
+
+
+admin_category_add:
+    path: '/admin/categories/add'
+    controller: App\Controller\Admin\CategoryController::new'
+
+admin_category_edit:
+    path: '/admin/categories/{id}/edit'
+    controller: App\Controller\Admin\CategoryController::edit'
+
+admin_category_delete:
+    path: '/admin/categories/{id}/delete'
+    controller: App\Controller\Admin\CategoryController::delete'
