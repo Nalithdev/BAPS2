@@ -492,7 +492,7 @@ class SecuredRouteController extends AbstractController
 
         }
 
-        return $this->json(['success' => true, 'message' => 'Vous pouvez consulter les catégories', 'categories' => $datas]);
+        return $this->json(['success' => true, 'message' => 'Vous pouvez consulter les catégories', $datas]);
 
 
     }
