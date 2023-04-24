@@ -29,21 +29,26 @@ class DashboardController extends AbstractDashboardController
         $admin = $this->getUser();
         if ($admin){
             if ($admin->getRoles()[0] == 'ROLE_ADMIN') {
-                $asks = $userRepository->findBy(
-                    [
-                        'approved'=> '0',
-
-                        ] );
+                $asks = $userRepository->findBy(['approved'=> '0']);
+				$authorized = $userRepository->findBy(['approved'=> '1']);
 
                 return $this->render('admin/asking.html.twig', [
                     'admin' => $admin,
                     'asks' => $asks,
+					'authorized' => $authorized,
                 ]);
             }
         }
         return $this->redirectToRoute('app_login');
 
     }
+	
+	#[Route('/', name: 'app_index')]
+	public function the_index(): Response
+	{
+		return $this->redirectToRoute('ask');
+	}
+	
     #[Route('/registertrad', name: 'app_register_trad')]
     public function registertrad( Request $request, \Doctrine\Persistence\ManagerRegistry $managerRegistry, UserRepository $userRepository): Response
     {
