@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Category;
 use App\Entity\Commerce;
 use App\Entity\User;
 use App\Repository\UserRepository;
@@ -100,5 +101,7 @@ class DashboardController extends AbstractDashboardController
 		yield MenuItem::section('Base de données');
 		yield MenuItem::linkToCrud('Utilisateurs', 'fas fa-list', User::class);
 		yield MenuItem::linkToCrud('Commerces', 'fas fa-shopping-cart', Commerce::class);
+        yield MenuItem::linkToCrud('Categories', 'fas fa-shopping-cart', Category::class);
+
     }
 }

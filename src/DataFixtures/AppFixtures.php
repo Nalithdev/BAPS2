@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Category;
 use App\Entity\Commerce;
 use App\Entity\Feed;
 use App\Entity\Product;
@@ -25,7 +26,7 @@ class AppFixtures extends Fixture
 		$user->setPassword($this->passwordHasher->hashPassword($user, 'password'));
 		$user->setFirstname('Francis');
 		$user->setLastname('Bertrand');
-		
+        $user->setLoyaltyPoints(0);
 		$user->setRoles(['ROLE_USER']);
 		
 		$manager->persist($user);
@@ -54,9 +55,7 @@ class AppFixtures extends Fixture
 		$merchant->setLastname('Lafont');
 		$merchant->setSiren('123456789');
 		$merchant->setApproved(false);
-		$merchant->setLoyaltyPoints(100);
 		$merchant->setRoles(['ROLE_MERCHANT']);
-		
 		$manager->persist($merchant);
 		
 		$manager->flush();
@@ -68,8 +67,7 @@ class AppFixtures extends Fixture
             $shop= new Commerce();
             $shop->setName($merchant->getFirstname() . ' ' . $merchant->getLastname());
             $shop->setDescription('description du commerce');
-			$shop->setAdresse('adresse du commerce');
-
+            $shop->setAdresse('adresse du commerce');
             $manager->persist($shop);
             $merchant->setCommerce($shop);
 
@@ -141,12 +139,17 @@ class AppFixtures extends Fixture
         $manager->flush();*/
 
 
+        //Creer des categories
 
-//Créer des reservations
-        //recuperer l'user avec le role merchant
+        for($i = 1; $i <= 30; $i++){
+        $category= new Category();
+        $category->setName('category ' . $i);
+        $category->setDescription('description de la category ' . $i);
 
+        $manager->persist($category);
+        }
 
-
+        $manager->flush();
 
     }
 

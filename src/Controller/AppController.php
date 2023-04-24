@@ -61,7 +61,7 @@ class AppController extends AbstractController
 
     }
     #[Route('/register', name: 'app_register')]
-    public function register(Request $request, ManagerRegistry $managerRegistry, UserPasswordHasherInterface $passwordHasher): Response
+    public function register(Request $request, ManagerRegistry $managerRegistry, UserPasswordHasherInterface $passwordHasher , UserRepository $userRepository): Response
     {
         $form = $request->toArray();
 
@@ -76,12 +76,17 @@ class AppController extends AbstractController
             $Nuser->setLastname($lastname);
             $Nuser->setEmail($email);
             $Nuser->setPassword($passwordHasher->hashPassword($Nuser, $password));
+
+            if($email == $userRepository->findOneBy(['email' => $email])){
+                return new JsonResponse(['success' => false, 'message' => 'Cet email est déjà utilisé']);
+            }
             if ($action == 'shop') {
                 if ($request->request->get('siren') != null) {
 
                     $Nuser->setRoles(['ROLE_MERCHANT']);
-                    $Nuser->setSiren($request->request->get('siren'));
+                    $Nuser->setSiren($form['siren']);
                     $Nuser->setApproved(false);
+                    $Nuser->setLoyaltyPoints(0);
                 } else {
                     return new JsonResponse(['success' => false, 'message' => 'Vous devez renseigner un siren']);
                 }
@@ -97,10 +102,6 @@ class AppController extends AbstractController
             return new JsonResponse(['success' => false, 'message' => 'Vous devez renseigner tous les champs']);
         }
 
-
-
-
-
     }
     #[Route('/auth1/{id}', name: 'app_auth1')]
     public function auth1(Request $request, UserRepository $userRepository, $id, ManagerRegistry $managerRegistry, TokenGeneratorInterface $tokenGenerator, TokenRepository $tokenRepository ): JsonResponse
@@ -113,7 +114,7 @@ class AppController extends AbstractController
         $Mytoken = $tokenRepository->findOneBy(['user_id' => $id]);
 
         if ($Mytoken) {
-            return $this->json  (['header' => ['code' => 200 , 'message' => 'Vous êtes connectés et votre token existe déja'] ,'token' => $Mytoken , 'id' => $id, 'role' => $role[0]]);
+            return $this->json  (["success" => true ,'token' => $Mytoken , 'id' => $id, 'role' => $role[0]]);
         }
         //bonjour
 
@@ -127,7 +128,7 @@ class AppController extends AbstractController
 
 
 
-        return $this->json  (['header' => ['code' => 200 , 'message' => 'Vous êtes connectés'] ,'token' => $Stoken , 'id' => $id, 'role' => $role[0]]);
+        return $this->json  (["success" => true ,'token' => $Stoken , 'id' => $id, 'role' => $role[0]]);
 
     }
 
