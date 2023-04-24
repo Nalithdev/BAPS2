@@ -64,6 +64,7 @@ class AppController extends AbstractController
     public function register(Request $request, ManagerRegistry $managerRegistry, UserPasswordHasherInterface $passwordHasher , UserRepository $userRepository): Response
     {
         $form = $request->toArray();
+
         $firstname = $form['firstname'];
         $lastname = $form['lastname'];
         $email = $form['email'];
