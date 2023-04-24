@@ -2,22 +2,22 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\Category;
-use App\Entity\Commerce;
+use App\Entity\Reservation;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
-class CommerceCrudController extends AbstractCrudController
+class ReservationCrudController extends AbstractCrudController
 {
     public static function getEntityFqcn(): string
     {
-        return Commerce::class;
+        return Reservation::class;
     }
 
     public function configureActions(Actions $actions): Actions
@@ -28,10 +28,11 @@ class CommerceCrudController extends AbstractCrudController
     {
         return [
             IdField::new('id'),
-            TextField::new('name')->setLabel('Nom'),
-            TextField::new('description'),
-			AssociationField::new('owner')->setLabel('Propriétaire'),
-			TextField::new('adresse'),
+            AssociationField::new("product")->setLabel("Produit"),
+            IntegerField::new("quantity")->setLabel("Quantité"),
+            TextField::new("status")->setLabel("Statut"),
+            DateField::new("Cdate")->setLabel("Date de création"),
+
         ];
     }
 }
