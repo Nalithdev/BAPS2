@@ -72,7 +72,7 @@ class AppController extends AbstractController
                 return new JsonResponse(['success' => false, 'message' => 'Cet email est déjà utilisé']);
             }
             if ($action == 'shop') {
-                if ($request->request->get('siren') != null) {
+                if ($form["siren"] != null) {
 
                     $Nuser->setRoles(['ROLE_MERCHANT']);
                     $Nuser->setSiren($form['siren']);
