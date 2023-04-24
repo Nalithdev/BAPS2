@@ -1,22 +1,70 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello Admin{% endblock %}
-
+{% block title %}Administration - Fid'Antony{% endblock %}
 {% block body %}
+    
+    <header>
+        <div class="header-block">
+            <img id="logo" src="{{ asset('logo.png') }}" alt="Logo">
+            <h1>Administration</h1>
+        </div>
 
-    <div class="example-wrapper">
-        <h1>Hello Admin ! ✅</h1>
+        <div class="header-block">
+            <a href="{{ path('admin') }}" class="button">Avancé</a>
+            <a href="{{ path('app_logout') }}" class="button">Déconnexion</a>
+        </div>
 
-        {% for ask in asks %}
-            <p>{{ ask.firstname }}</p>
-            <p>{{ ask.email }}</p>
-            <p>{{ ask.siren }}</p>
-            <form method="post" action="{{ path('app_register_trad') }}">
-                <input type="hidden" name="id" value="{{ ask.id }}">
-                <input type="hidden" name="name" value="{{ ask.firstname }}">
-                <button type="submit" name="action" value="accept">Accepter</button>
-                <button type="submit" name="action" value="refuse">Refuser</button>
-            </form>
-        {% endfor %}
-    </div>
+    </header>
+
+    <main class="admin">
+        <div class="pending">
+
+            {% if asks|length > 0 %}
+                {% for ask in asks %}
+                    <div class="card">
+                        <p>{{ ask.firstname }}</p>
+                        <p>{{ ask.lastname }}</p>
+                        <p>{{ ask.email }}</p>
+                        <p>{{ ask.siren }}</p>
+                        <form method="post" action="{{ path('app_register_trad') }}">
+                            <input type="hidden" name="id" value="{{ ask.id }}">
+                            <button type="submit" name="action" value="accept">Accepter</button>
+                            <button type="submit" name="action" value="refuse">Refuser</button>
+                        </form>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>Aucune demande en attente</p>
+            {% endif %}
+        </div>
+        <div class="manage">
+            {% if authorized|length > 0 %}
+                {% for shop in authorized %}
+                    <div class="card">
+                        <p>{{ shop.firstname }} {{ shop.lastname }}</p>
+                        <a href="mailto:{{ shop.email }}">{{ shop.email }}</a>
+                        <p>SIREN : {{ shop.siren }}</p>
+                       {% if shop.commerce is defined %}
+                           <div class="info">
+                               <h3>Informations :</h3>
+                               <p class="name">{{ shop.commerce.name }}</p>
+                               <p class="adress">{{ shop.commerce.adresse }}</p>
+                               <p class="desc">{{ shop.commerce.description }}</p>
+                               <p class="feed">Messages : {{ shop.feeds|length }}</p>
+                               <p class="product">Produits enregistrés : {{ shop.commerce.products|length }}</p>
+
+                           </div>
+                       {% else %}
+                            <div class="info">
+                                 <p>Compte non activé</p>
+                            </div>
+                       {% endif %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>Aucun commerçant enregistré</p>
+            {% endif %}
+        </div>
+    </main>
+
 {% endblock %}
