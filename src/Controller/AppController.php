@@ -61,10 +61,9 @@ class AppController extends AbstractController
 
     }
     #[Route('/register', name: 'app_register')]
-    public function register(Request $request, ManagerRegistry $managerRegistry, UserPasswordHasherInterface $passwordHasher): Response
+    public function register(Request $request, ManagerRegistry $managerRegistry, UserPasswordHasherInterface $passwordHasher , UserRepository $userRepository): Response
     {
         $form = $request->toArray();
-
         $firstname = $form['firstname'];
         $lastname = $form['lastname'];
         $email = $form['email'];
@@ -76,6 +75,10 @@ class AppController extends AbstractController
             $Nuser->setLastname($lastname);
             $Nuser->setEmail($email);
             $Nuser->setPassword($passwordHasher->hashPassword($Nuser, $password));
+
+            if($email == $userRepository->findOneBy(['email' => $email])){
+                return new JsonResponse(['success' => false, 'message' => 'Cet email est déjà utilisé']);
+            }
             if ($action == 'shop') {
                 if ($request->request->get('siren') != null) {
 
