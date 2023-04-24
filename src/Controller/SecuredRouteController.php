@@ -477,12 +477,14 @@ class SecuredRouteController extends AbstractController
         $session = $this->user;
 
         if($session->getRoles()[0] == 'ROLE_ADMIN'){
-
+            $datas = array();
             foreach ($categories as $c) {
 
-                $datas = [
+                $datas[] = [
 
-                    'categories' => $c,
+                    'id' => $c->getId(),
+                    'name' => $c->getName(),
+                    'description' => $c->getDescription(),
                     'url' => '/api/categories/' . $c->getId(),
 
                 ];
@@ -500,24 +502,29 @@ class SecuredRouteController extends AbstractController
     #[Route('/categories/{id}', name: 'app_categories_id', methods: ['GET'])]
     public function categoriesId(CategoryRepository $categoryRepository, $id): Response
     {
-        $category = $categoryRepository->find($id);
+        $category = $categoryRepository->findOneBy(array('id' =>$id));
         $session = $this->user;
+
         if($session->getRoles()[0] == 'ROLE_ADMIN'){
+            $data = array();
 
-            foreach ($category as $cy) {
 
-                $data = [
+                $data[] = [
 
-                    'id' => $cy->getId(),
-                    'name' => $cy->getName(),
-                    'description' => $cy->getDescription(),
+                    'id' => $category->getId(),
+                    'name' => $category->getName(),
+                    'description' => $category->getDescription(),
 
                 ];
 
-            }
-        }
 
-        return $this->json(['success' => true, 'message' => 'Vous pouvez consulter les catégories', 'categories' => $data]);
+
+            return $this->json(['success' => true, 'message' => 'Vous pouvez consulter les catégories', 'categories' => $data]);
+
+        }
+        return $this->json(['success' => false, 'message' => 'Vous n\'avez pas les droits pour accéder à cette page']);
+
+
 
     }
 
