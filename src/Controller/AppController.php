@@ -51,7 +51,7 @@ class AppController extends AbstractController
         }
         return $this->json(['success' => false, 'message' => 'Identifiants incorrects']);
     }
-    #[Route('/register', name: 'app_register')]
+    #[Route('/register', name: 'app_register' , methods: ['POST'])]
     public function register(Request $request, ManagerRegistry $managerRegistry, UserPasswordHasherInterface $passwordHasher , UserRepository $userRepository): Response
     {
         $form = $request->toArray();
