@@ -67,6 +67,7 @@ class AppController extends AbstractController
             $Nuser->setLastname($lastname);
             $Nuser->setEmail($email);
             $Nuser->setPassword($passwordHasher->hashPassword($Nuser, $password));
+            $Nuser->setLoyaltyPoints(0);
 
             if($email == $userRepository->findOneBy(['email' => $email])){
                 return new JsonResponse(['success' => false, 'message' => 'Cet email est déjà utilisé']);
@@ -77,7 +78,7 @@ class AppController extends AbstractController
                     $Nuser->setRoles(['ROLE_MERCHANT']);
                     $Nuser->setSiren($form['siren']);
                     $Nuser->setApproved(false);
-                    $Nuser->setLoyaltyPoints(0);
+
                 } else {
                     return new JsonResponse(['success' => false, 'message' => 'Vous devez renseigner un siren']);
                 }

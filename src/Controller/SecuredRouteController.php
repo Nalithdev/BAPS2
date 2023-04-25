@@ -588,7 +588,7 @@ class SecuredRouteController extends AbstractController
 
 
 
-            return $this->json(['success' => true, 'message' => 'Vous avez modifié votre profile']);
+            return $this->json(['success' => true, 'message' => 'Vous avez modifié votre mot de passe']);
 
         }
         return $this->json(['success' => false, 'message' => 'Vous n\'êtes pas l\'user lié à ce compte']);
