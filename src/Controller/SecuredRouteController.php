@@ -560,11 +560,11 @@ class SecuredRouteController extends AbstractController
 
     }
     #[Route('/user/{id}/modify', name: 'modify_user', methods: ['PUT', 'POST'])]
-    public function UModify(UserRepository $userRepository, ManagerRegistry $managerRegistry, Request $request, UserPasswordHasherInterface $passwordHasher): Response
+    public function UModify($id, UserRepository $userRepository, ManagerRegistry $managerRegistry, Request $request, UserPasswordHasherInterface $passwordHasher): Response
     {
 
         $session = $this->user;
-        $user = $userRepository->findOneBy(array('id' =>$session->getId()));
+        $user = $userRepository->findOneBy(array('id' =>$id));
         if ($user){
             $form = $request->toArray();
 
