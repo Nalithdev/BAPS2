@@ -227,7 +227,7 @@ class SecuredRouteController extends AbstractController
 
 
     }
-    #[Route('/product/{id}/modify', name: 'app_product', methods: ['POST'])]
+    #[Route('/product/{id}/modify', name: 'app_Mproduct', methods: ['POST'])]
     public function Mproduct(ManagerRegistry $managerRegistry, Request $request, ProductRepository $productRepository): Response
     {
         $user = $this->user;
@@ -379,7 +379,7 @@ class SecuredRouteController extends AbstractController
 
     }
 
-    #[Route('/getuser/{token}', name: 'reserved_get', methods: ['GET'])]
+    #[Route('/getuser/{token}', name: 'token_get', methods: ['GET'])]
     public function GetTUser($token , TokenRepository $tokenRepository , UserRepository $userRepository): Response
 
     {
@@ -537,7 +537,7 @@ class SecuredRouteController extends AbstractController
     //modifié l'utilisateur
 
 
-    #[Route('/user/{id}', name: 'user', methods: ['GET'])]
+    #[Route('/user/{id}', name: 'Puser', methods: ['GET'])]
     public function user(UserRepository $userRepository, $id): Response
 
     {
