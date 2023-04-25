@@ -4,6 +4,9 @@ namespace App\Controller\Admin;
 
 use App\Entity\Category;
 use App\Entity\Commerce;
+use App\Entity\Product;
+use App\Entity\Reservation;
+use App\Entity\Token;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -30,15 +33,13 @@ class DashboardController extends AbstractDashboardController
         $admin = $this->getUser();
         if ($admin){
             if ($admin->getRoles()[0] == 'ROLE_ADMIN') {
-                $asks = $userRepository->findBy(
-                    [
-                        'approved'=> '0',
-
-                        ] );
+                $asks = $userRepository->findBy(['approved'=> '0']);
+				$authorized = $userRepository->findBy(['approved'=> '1']);
 
                 return $this->render('admin/asking.html.twig', [
                     'admin' => $admin,
                     'asks' => $asks,
+					'authorized' => $authorized,
                 ]);
             }
         }
@@ -55,6 +56,13 @@ class DashboardController extends AbstractDashboardController
         return $this->redirectToRoute('ask');
     }
 
+
+	
+	#[Route('/', name: 'app_index')]
+	public function the_index(): Response
+	{
+		return $this->redirectToRoute('ask');
+	}
 
     #[Route('/registertrad', name: 'app_register_trad')]
     public function registertrad( Request $request, \Doctrine\Persistence\ManagerRegistry $managerRegistry, UserRepository $userRepository): Response
@@ -106,14 +114,18 @@ class DashboardController extends AbstractDashboardController
 
     public function configureMenuItems(): iterable
     {
-        //yield MenuItem::linkToUrl('Retour au site', 'fas fa-home', '/');
         yield MenuItem::linkToUrl("Administration", 'fas fa-gear', '/admin');
-		yield MenuItem::linkToUrl("Une otarie qui tourne", 'fas fa-water', 'https://www.youtube.com/watch?v=eY52Zsg-KVI');
-		//ajouter un espace
-		yield MenuItem::section('Base de données');
+
+        yield MenuItem::section('Utilisateur', 'fas fa-user');
 		yield MenuItem::linkToCrud('Utilisateurs', 'fas fa-list', User::class);
-		yield MenuItem::linkToCrud('Commerces', 'fas fa-shopping-cart', Commerce::class);
-        yield MenuItem::linkToCrud('Categories', 'fas fa-shopping-cart', Category::class);
+        yield MenuItem::linkToCrud('Tokens', 'fas fa-key', Token::class);
+
+        yield MenuItem::section('Commerce', 'fas fa-home');
+        yield MenuItem::linkToCrud('Commerces', 'fas fa-list', Commerce::class);
+        yield MenuItem::linkToCrud('Categories', 'fas fa-tag', Category::class);
+        yield MenuItem::linkToCrud('Réservations', 'fas fa-basket-shopping', Reservation::class);
+        yield MenuItem::linkToCrud('Produits', 'fas fa-burger', Product::class);
+
 
     }
 }

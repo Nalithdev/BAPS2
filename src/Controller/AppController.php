@@ -51,15 +51,6 @@ class AppController extends AbstractController
         }
         return $this->json(['success' => false, 'message' => 'Identifiants incorrects']);
     }
-    #[Route('/', name: 'app_index')]
-    public function index(): Response
-    {
-        return $this->render('app/index.html.twig', [
-            'controller_name' => 'AppController',
-        ]);
-
-
-    }
     #[Route('/register', name: 'app_register' , methods: ['POST'])]
     public function register(Request $request, ManagerRegistry $managerRegistry, UserPasswordHasherInterface $passwordHasher , UserRepository $userRepository): Response
     {
