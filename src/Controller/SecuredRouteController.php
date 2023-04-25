@@ -566,7 +566,6 @@ class SecuredRouteController extends AbstractController
         $session = $this->user;
         $user = $userRepository->findOneBy(array('id' =>$session->getId()));
         $form = $request->toArray();
-        dd($form);
         if ($user){
 
 
