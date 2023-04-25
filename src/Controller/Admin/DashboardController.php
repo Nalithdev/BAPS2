@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\Category;
 use App\Entity\Commerce;
+use App\Entity\Feed;
 use App\Entity\Product;
 use App\Entity\Reservation;
 use App\Entity\Token;
@@ -121,6 +122,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Tokens', 'fas fa-key', Token::class);
 
         yield MenuItem::section('Commerce', 'fas fa-home');
+		yield MenuItem::linkToCrud('Actualités', 'fas fa-newspaper', Feed::class);
         yield MenuItem::linkToCrud('Commerces', 'fas fa-list', Commerce::class);
         yield MenuItem::linkToCrud('Categories', 'fas fa-tag', Category::class);
         yield MenuItem::linkToCrud('Réservations', 'fas fa-basket-shopping', Reservation::class);
