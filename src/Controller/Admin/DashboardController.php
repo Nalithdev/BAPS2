@@ -6,6 +6,7 @@ use App\Entity\Category;
 use App\Entity\Commerce;
 use App\Entity\User;
 use App\Repository\UserRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
@@ -44,6 +45,17 @@ class DashboardController extends AbstractDashboardController
         return $this->redirectToRoute('app_login');
 
     }
+
+    #[Route('/deletetrad/{id}', name: 'app_delete_trad')]
+    public function deletetrad( Request $request, ManagerRegistry $managerRegistry, UserRepository $userRepository , $id): Response
+    {
+        $user = $userRepository->findOneBy(['id' => $id]);
+        $managerRegistry->getManager()->remove($user);
+        $managerRegistry->getManager()->flush();
+        return $this->redirectToRoute('ask');
+    }
+
+
     #[Route('/registertrad', name: 'app_register_trad')]
     public function registertrad( Request $request, \Doctrine\Persistence\ManagerRegistry $managerRegistry, UserRepository $userRepository): Response
     {
