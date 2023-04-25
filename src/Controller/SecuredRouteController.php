@@ -138,6 +138,69 @@ class SecuredRouteController extends AbstractController
         }
         return $this->json(['success' => false, 'message' => 'Vous n\'avez pas les droits pour accéder à cette page']);
     }
+    #[Route('/shop/{id}', name: 'app_product_id', methods: ['GET'])]
+    public function show(ProductRepository $productRepository, CommerceRepository $commerceRepository, $id): Response
+    {
+        $shop = $commerceRepository->findOneBy(['id' => $id]);
+        if ($shop == null) {
+            return $this->json(['success' => false, 'message' => 'Ce commerce n\'existe pas']);
+        }
+
+
+        $product = $productRepository->findBy(['shop' => $shop]);
+        $Tshop = array();
+        $Tmessage = array();
+        $Tshoop = array();
+
+        $product_list = array();
+
+        foreach ($product as $p) {
+            $product_list[] = [
+                'id' => $p->getId(),
+                'name' => $p->getName(),
+                'description' => $p->getDescription(),
+                'price' => $p->getPrice(),
+                'stock' => $p->getStock(),
+            ];
+        }
+
+
+        $Tshop = [
+            'id' => $shop->getId(),
+            'name' => $shop->getName(),
+            'description' => $shop->getDescription(),
+            'product' => $product_list,
+            'adresse' => $shop->getAdresse(),
+        ];
+
+
+        return $this->json(['success' => true, 'message' => 'Envoie du commerce et de leur produit au client', 'shop' => $Tshop]);
+    }
+    #[Route('/shops', name: 'modify_user', methods: ['GET'])]
+    public function GShops(CommerceRepository $commerceRepository): Response
+    {
+
+        $session = $this->user;
+        $commerce = $commerceRepository->findAll();
+        $data = array();
+        foreach ($commerce as $c)
+        {
+            $data[] =
+                [
+                    'id' => $c->getId(),
+                    'name' => $c->getName(),
+                    'description' => $c->getDescription(),
+                    'adresse' => $c->getAdresse(),
+                ];
+
+        }
+        return $this->json(['success' => true, 'message' => 'Vous pouvez consulter les commerces', 'commerces' => $data]);
+
+
+
+
+    }
+
 
 
     #[Route('/product', name: 'app_product', methods: ['POST'])]
@@ -185,67 +248,8 @@ class SecuredRouteController extends AbstractController
 
     }
 
-    #[Route('/shop/{id}', name: 'app_product_id', methods: ['GET'])]
-    public function show(ProductRepository $productRepository, CommerceRepository $commerceRepository, $id): Response
-    {
-        $shop = $commerceRepository->findOneBy(['id' => $id]);
-        if ($shop == null) {
-            return $this->json(['success' => false, 'message' => 'Ce commerce n\'existe pas']);
-        }
 
 
-        $product = $productRepository->findBy(['shop' => $shop]);
-        $Tshop = array();
-        $Tmessage = array();
-        $Tshoop = array();
-
-        $product_list = array();
-
-        foreach ($product as $p) {
-            $product_list[] = [
-                'id' => $p->getId(),
-                'name' => $p->getName(),
-                'description' => $p->getDescription(),
-                'price' => $p->getPrice(),
-                'stock' => $p->getStock(),
-            ];
-        }
-
-
-        $Tshop = [
-            'id' => $shop->getId(),
-            'name' => $shop->getName(),
-            'description' => $shop->getDescription(),
-            'product' => $product_list,
-            'adresse' => $shop->getAdresse(),
-        ];
-
-
-        return $this->json(['success' => true, 'message' => 'Envoie du commerce et de leur produit au client', 'shop' => $Tshop]);
-    }
-
-    #[Route('/user/{id}', name: 'user', methods: ['GET'])]
-    public function user(UserRepository $userRepository, $id): Response
-
-    {
-        $session = $this->user;
-
-        $users = $userRepository->findOneBy(['id' => $id]);
-
-        if ($session->getRoles()[0] == 'ROLE_ADMIN' || $session->getId() == $users->getId()) {
-            $data = [
-                'id' => $users->getId(),
-                'firstname' => $users->getFirstname(),
-                'lastname' => $users->getLastname(),
-                'email' => $users->getEmail(),
-                'role' => $users->getRoles()[0],
-            ];
-            return $this->json(['success' => true, 'user' => $data]);
-        } else {
-            return $this->json(['success' => false, 'message' => 'Vous n\'avez pas les droits pour accéder à cette page']);
-        }
-
-    }
 
     #[Route('/reserved/', name: 'reserved_post', methods: ['POST'])]
     public function Reserved(UserRepository $userRepository, Request $request, ManagerRegistry $managerRegistry): Response
@@ -265,68 +269,32 @@ class SecuredRouteController extends AbstractController
         return $this->json(['success' => true, 'message' => 'Votre réservation a bien été prise en compte']);
 
     }
-    #[Route('/getuser/{token}', name: 'reserved_get', methods: ['GET'])]
-    public function GetTUser($token , TokenRepository $tokenRepository , UserRepository $userRepository): Response
+    #[Route('/reservation', name: 'get_reservation', methods: ['GET'])]
+    public function get_reserved(ReservationRepository $reservationRepository, ManagerRegistry $managerRegistry): Response
 
     {
+        $data = array();
         $session = $this->user;
-        $token = $tokenRepository->findOneBy(['token_id' => $token]);
-        if ($session->getRoles()[0] == 'ROLE_MERCHANT') {
-            $user_id = $token->getUserId();
-            $user= $userRepository->findOneBy(['id' => $user_id]);
-            $data = [
-                'id' => $user->getId(),
-                'firstname' => $user->getFirstname(),
-                'lastname' => $user->getLastname(),
-                'email' => $user->getEmail()
+
+        $reservations = $reservationRepository->findBy(['user' => $session]);
+        foreach ($reservations as $r) {
+            if ($r->getCdate() < new \DateTime("1day ago"))
+            {
+                $managerRegistry->getManager()->remove($r);
+                $managerRegistry->getManager()->flush();
+                return $this->json(['success' => false, 'message' => 'Votre réservation a expiré']);
+
+            }
+            $data[] = [
+                'id' => $r->getId(),
+                'product' => $r->getProduct()->getId(),
+                'quantity' => $r->getQuantity(),
+                'date' => $r->getCdate(),
             ];
-
-
-            return $this->json(['success' => true, 'message' => 'Envoie des réservations au client', 'user' => $data]);
         }
-        else {
-            return $this->json(['success' => false, 'message' => 'Vous n\'avez pas les droits pour accéder à cette page']);
-        }
-
+        return $this->json(['success' => true, 'message' => 'Voici vos réservations', 'reservation' => $data]);
     }
 
-    #[Route('/point/{id}/add', name: 'point_add', methods: ['POST'])]
-    public function AddPoint(UserRepository $userRepository, ManagerRegistry $managerRegistry, Request $request): Response
-    {
-        $session = $this->user;
-        $points = $request->toArray();
-        $user = $userRepository->findOneBy(['id' => $session->getId()]);
-        $user->setLoyaltyPoints($user->getLoyaltyPoints() + $points['points']);
-
-        $data = [
-            'points de fidélité' => $user->getLoyaltyPoints(),
-        ];
-
-        return $this->json(['success' => true, 'message' => '', 'reservation' => $data]);
-
-
-
-
-    }
-
-    #[Route('/point/{id}/remove', name: 'point_delete', methods: ['POST'])]
-    public function DeletePoint(UserRepository $userRepository, ManagerRegistry $managerRegistry, Request $request): Response
-    {
-        $session = $this->user;
-        $user = $userRepository->findOneBy(['id' => $session->getId()]);
-        $points = $request->toArray();
-        $point = intval($points['points']);
-        $Fpoint = $user->getLoyaltyPoints() - $point;
-        if ($Fpoint < 0) $Fpoint = 0;
-        $user->setLoyaltyPoints($Fpoint);
-        $managerRegistry->getManager()->persist($user);
-        $managerRegistry->getManager()->flush();
-        $data = [
-            'points de fidélité' => $user->getLoyaltyPoints(),
-        ];
-        return $this->json(['success' => true, 'amounts' => $data]);
-
-    }
 
     #[Route('/shop/{id}/reservations', name: 'reserved_get', methods: ['GET'])]
     public function ReservedGet(Commerce $commerce, ManagerRegistry $managerRegistry): Response
@@ -396,46 +364,84 @@ class SecuredRouteController extends AbstractController
         }
     }
 
-        #[Route('/shop/reservation/{id}/delete', name: 'delete_reservation' , methods: ['DELETE'])]
+    #[Route('/shop/reservation/{id}/delete', name: 'delete_reservation' , methods: ['DELETE'])]
     public function delete_reserved(ReservationRepository $reservationRepository, $id, ManagerRegistry $managerRegistry): Response
     {
         $session = $this->user;
 
         $shop_reservation_id = $reservationRepository->findOneBy(['id' => $id]);
-            $managerRegistry->getManager()->remove($shop_reservation_id);
-            $managerRegistry->getManager()->flush();
+        $managerRegistry->getManager()->remove($shop_reservation_id);
+        $managerRegistry->getManager()->flush();
 
-            return $this->json(['success' => true, 'message' => 'La reservation a bien été supprimer']);
+        return $this->json(['success' => true, 'message' => 'La reservation a bien été supprimer']);
 
 
 
     }
 
-    #[Route('/reservation', name: 'get_reservation', methods: ['GET'])]
-    public function get_reserved(ReservationRepository $reservationRepository, ManagerRegistry $managerRegistry): Response
+    #[Route('/getuser/{token}', name: 'reserved_get', methods: ['GET'])]
+    public function GetTUser($token , TokenRepository $tokenRepository , UserRepository $userRepository): Response
 
     {
-        $data = array();
         $session = $this->user;
-
-        $reservations = $reservationRepository->findBy(['user' => $session]);
-        foreach ($reservations as $r) {
-            if ($r->getCdate() < new \DateTime("1day ago"))
-            {
-                $managerRegistry->getManager()->remove($r);
-                $managerRegistry->getManager()->flush();
-                return $this->json(['success' => false, 'message' => 'Votre réservation a expiré']);
-
-            }
-            $data[] = [
-                'id' => $r->getId(),
-                'product' => $r->getProduct()->getId(),
-                'quantity' => $r->getQuantity(),
-                'date' => $r->getCdate(),
+        $token = $tokenRepository->findOneBy(['token_id' => $token]);
+        if ($session->getRoles()[0] == 'ROLE_MERCHANT') {
+            $user_id = $token->getUserId();
+            $user= $userRepository->findOneBy(['id' => $user_id]);
+            $data = [
+                'id' => $user->getId(),
+                'firstname' => $user->getFirstname(),
+                'lastname' => $user->getLastname(),
+                'email' => $user->getEmail()
             ];
+
+
+            return $this->json(['success' => true, 'message' => 'Envoie des réservations au client', 'user' => $data]);
         }
-        return $this->json(['success' => true, 'message' => 'Voici vos réservations', 'reservation' => $data]);
+        else {
+            return $this->json(['success' => false, 'message' => 'Vous n\'avez pas les droits pour accéder à cette page']);
+        }
+
     }
+
+    #[Route('/point/{id}/add', name: 'point_add', methods: ['POST'])]
+    public function AddPoint(UserRepository $userRepository, ManagerRegistry $managerRegistry, Request $request): Response
+    {
+        $session = $this->user;
+        $points = $request->toArray();
+        $user = $userRepository->findOneBy(['id' => $session->getId()]);
+        $user->setLoyaltyPoints($user->getLoyaltyPoints() + $points['points']);
+
+        $data = [
+            'points de fidélité' => $user->getLoyaltyPoints(),
+        ];
+
+        return $this->json(['success' => true, 'message' => '', 'reservation' => $data]);
+
+
+
+
+    }
+
+    #[Route('/point/{id}/remove', name: 'point_delete', methods: ['POST'])]
+    public function DeletePoint(UserRepository $userRepository, ManagerRegistry $managerRegistry, Request $request): Response
+    {
+        $session = $this->user;
+        $user = $userRepository->findOneBy(['id' => $session->getId()]);
+        $points = $request->toArray();
+        $point = intval($points['points']);
+        $Fpoint = $user->getLoyaltyPoints() - $point;
+        if ($Fpoint < 0) $Fpoint = 0;
+        $user->setLoyaltyPoints($Fpoint);
+        $managerRegistry->getManager()->persist($user);
+        $managerRegistry->getManager()->flush();
+        $data = [
+            'points de fidélité' => $user->getLoyaltyPoints(),
+        ];
+        return $this->json(['success' => true, 'amounts' => $data]);
+
+    }
+
 
 
     #[Route('/logout', name: 'disconect' , methods: ['GET'])]
@@ -529,6 +535,30 @@ class SecuredRouteController extends AbstractController
 
     }
     //modifié l'utilisateur
+
+
+    #[Route('/user/{id}', name: 'user', methods: ['GET'])]
+    public function user(UserRepository $userRepository, $id): Response
+
+    {
+        $session = $this->user;
+
+        $users = $userRepository->findOneBy(['id' => $id]);
+
+        if ($session->getRoles()[0] == 'ROLE_ADMIN' || $session->getId() == $users->getId()) {
+            $data = [
+                'id' => $users->getId(),
+                'firstname' => $users->getFirstname(),
+                'lastname' => $users->getLastname(),
+                'email' => $users->getEmail(),
+                'role' => $users->getRoles()[0],
+            ];
+            return $this->json(['success' => true, 'user' => $data]);
+        } else {
+            return $this->json(['success' => false, 'message' => 'Vous n\'avez pas les droits pour accéder à cette page']);
+        }
+
+    }
     #[Route('/user/{id}/modify', name: 'modify_user', methods: ['PUT', 'POST'])]
     public function UModify(UserRepository $userRepository, ManagerRegistry $managerRegistry, Request $request, UserPasswordHasherInterface $passwordHasher): Response
     {
@@ -596,32 +626,6 @@ class SecuredRouteController extends AbstractController
 
 
     }
-
-    #[Route('/shops', name: 'modify_user', methods: ['GET'])]
-    public function GShops(CommerceRepository $commerceRepository): Response
-    {
-
-        $session = $this->user;
-        $commerce = $commerceRepository->findAll();
-        $data = array();
-        foreach ($commerce as $c)
-        {
-            $data[] =
-                [
-                    'id' => $c->getId(),
-                    'name' => $c->getName(),
-                    'description' => $c->getDescription(),
-                    'adresse' => $c->getAdresse(),
-                ];
-
-        }
-        return $this->json(['success' => true, 'message' => 'Vous pouvez consulter les commerces', 'commerces' => $data]);
-
-
-
-
-    }
-
 
 
 
