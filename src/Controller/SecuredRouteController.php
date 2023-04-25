@@ -176,7 +176,7 @@ class SecuredRouteController extends AbstractController
 
         return $this->json(['success' => true, 'message' => 'Envoie du commerce et de leur produit au client', 'shop' => $Tshop]);
     }
-    #[Route('/shops', name: 'modify_user', methods: ['GET'])]
+    #[Route('/shops', name: 'getAllShop', methods: ['GET'])]
     public function GShops(CommerceRepository $commerceRepository): Response
     {
 
@@ -559,14 +559,16 @@ class SecuredRouteController extends AbstractController
         }
 
     }
-    #[Route('/user/{id}/modify', name: 'modify_user', methods: ['PUT', 'POST'])]
-    public function UModify($id, UserRepository $userRepository, ManagerRegistry $managerRegistry, Request $request, UserPasswordHasherInterface $passwordHasher): Response
+    #[Route('/user/modify', name: 'modify_users', methods:['POST'])]
+    public function UModify(UserRepository $userRepository, ManagerRegistry $managerRegistry, Request $request, UserPasswordHasherInterface $passwordHasher): Response
     {
 
         $session = $this->user;
-        $user = $userRepository->findOneBy(array('id' =>$id));
+        $user = $userRepository->findOneBy(array('id' =>$session->getId()));
+        $form = $request->toArray();
+        dd($form);
         if ($user){
-            $form = $request->toArray();
+
 
             if ($form['email'] == null){
                 $form['email'] = $user->getEmail();
@@ -600,7 +602,7 @@ class SecuredRouteController extends AbstractController
 
     }
 
-    #[Route('/user/{id}/MDPmodify', name: 'modify_user', methods: ['PUT', 'POST'])]
+    #[Route('/user/MDPmodify', name: 'modify_mdp', methods: ['POST'])]
     public function ModifyMDP(UserRepository $userRepository, ManagerRegistry $managerRegistry, Request $request, UserPasswordHasherInterface $passwordHasher): Response
     {
 
