@@ -2,7 +2,7 @@
 
 {% block title %}Administration - Fid'Antony{% endblock %}
 {% block body %}
-    
+
     <header>
         <div class="header-block">
             <img id="logo" src="{{ asset('logo.png') }}" alt="Logo">
@@ -10,8 +10,8 @@
         </div>
 
         <div class="header-block">
-            <a href="{{ path('admin') }}" class="button">Avancé</a>
-            <a href="{{ path('app_logout') }}" class="button">Déconnexion</a>
+            <a href="{{ path('admin') }}" class="button no-border">Avancé</a>
+            <a href="{{ path('app_logout') }}" class="button no-border">Déconnexion</a>
         </div>
 
     </header>
@@ -22,15 +22,24 @@
             {% if asks|length > 0 %}
                 {% for ask in asks %}
                     <div class="card">
-                        <p>{{ ask.firstname }}</p>
-                        <p>{{ ask.lastname }}</p>
-                        <p>{{ ask.email }}</p>
-                        <p>{{ ask.siren }}</p>
-                        <form method="post" action="{{ path('app_register_trad') }}">
-                            <input type="hidden" name="id" value="{{ ask.id }}">
-                            <button type="submit" name="action" value="accept">Accepter</button>
-                            <button type="submit" name="action" value="refuse">Refuser</button>
-                        </form>
+                        <div class="category">
+                            <p>{{ ask.firstname }}</p>
+                            <p>{{ ask.lastname }}</p>
+                            <p>{{ ask.email }}</p>
+                            <p>{{ ask.siren }}</p>
+                            <form method="post" action="{{ path('app_register_trad') }}">
+                                <input type="hidden" name="id" value="{{ ask.id }}">
+                                <button type="submit" name="action" value="accept">Accepter</button>
+                                <button type="submit" name="action" value="refuse">Refuser</button>
+                            </form>
+                        </div>
+                        <div class="category">
+                            <form action="" class="check-siren">
+                                <input type="hidden" name="id" value="{{ ask.siren }}">
+                                <button type="submit">Vérifier le SIREN</button>
+                            </form>
+                            <p class="check-result"></p>
+                        </div>
                     </div>
                 {% endfor %}
             {% else %}
@@ -38,27 +47,39 @@
             {% endif %}
         </div>
         <div class="manage">
+            <script src="https://cdn.jsdelivr.net/npm/json-highlight/dist/json-highlight.min.js"></script>
             {% if authorized|length > 0 %}
                 {% for shop in authorized %}
                     <div class="card">
-                        <p>{{ shop.firstname }} {{ shop.lastname }}</p>
-                        <a href="mailto:{{ shop.email }}">{{ shop.email }}</a>
-                        <p>SIREN : {{ shop.siren }}</p>
-                       {% if shop.commerce is defined %}
-                           <div class="info">
-                               <h3>Informations :</h3>
-                               <p class="name">{{ shop.commerce.name }}</p>
-                               <p class="adress">{{ shop.commerce.adresse }}</p>
-                               <p class="desc">{{ shop.commerce.description }}</p>
-                               <p class="feed">Messages : {{ shop.feeds|length }}</p>
-                               <p class="product">Produits enregistrés : {{ shop.commerce.products|length }}</p>
+                        <img src="{{ asset("logo.png") }}" alt="" class="illustration">
 
-                           </div>
-                       {% else %}
-                            <div class="info">
-                                 <p>Compte non activé</p>
+                        {% if shop.commerce is defined and shop.commerce is not same as null %}
+                            <div class="head">
+                                <h3><i class="fa fa-shop"></i> {{ shop.commerce.name }}</h3>
+                                <button class="delete">Supprimer</button>
                             </div>
-                       {% endif %}
+                            <div class="info">
+                                <p class="owner"><i class="fa fa-user"></i>  {{ shop.firstname }} {{ shop.lastname }}</p>
+                                <p><i class="fa fa-paperclip"></i>  SIREN : <span class="insee-siren">{{ shop.siren }}</span></p>
+                                <a href="mailto:{{ shop.email }}" class="email"><i class="fa fa-mail-bulk"></i>  {{ shop.email }}</a>
+                                <p class="adress"><i class="fa fa-home"></i>  {{ shop.commerce.adresse }}</p>
+                                <p class="desc"><i class="fa fa-note-sticky"></i>  {{ shop.commerce.description }}</p>
+                                <p class="feed"><i class="fa fa-message"></i>  Messages : {{ shop.feeds|length }}</p>
+                                <p class="product"><i class="fa fa-shopping-bag"></i>  Produits enregistrés : {{ shop.commerce.products|length }}</p>
+                            </div>
+                        {% else %}
+                            <div class="head">
+                                <h3><i class="fa fa-user"></i>  {{ shop.firstname }} {{ shop.lastname }}</h3>
+                                <button class="delete">Supprimer</button>
+                            </div>
+                            <div class="info">
+                                <a href="mailto:{{ shop.email }}" class="email"><i class="fa fa-mail-bulk"></i>  {{ shop.email }}</a>
+                                <p><i class="fa fa-paperclip"></i>  SIREN : <span class="insee-siren">{{ shop.siren }}</span></p>
+                                <p><i class="fa fa-shop"></i>  Compte non activé</p>
+                            </div>
+                        {% endif %}
+                        <button class="insee-info button">Informations de l'INSEE</button>
+                        <pre class="insee-display"></pre>
                     </div>
                 {% endfor %}
             {% else %}
@@ -66,5 +87,58 @@
             {% endif %}
         </div>
     </main>
+
+    <script>
+        const checkSiren = document.querySelectorAll('.check-siren');
+        const checkResult = document.querySelectorAll('.check-result');
+        checkSiren.forEach((form, index) => {
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                form.querySelector('button').innerHTML = "Patientez...";
+                form.querySelector('button').disabled = true;
+                const siren = form.querySelector('input').value;
+                const url = 'https://api.insee.fr/entreprises/sirene/V3/siren/' + siren;
+                fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': 'Bearer 5529c9f2-3397-333f-b03b-9a4219f63ae1'
+                    }
+                }).then(response => response.json()).then(data => {
+                    form.querySelector('button').innerHTML = "Vérifier le SIREN";
+                    form.querySelector('button').disabled = false;
+                    checkResult[index].innerHTML = data.header.message;
+                });
+            });
+        });
+
+        const inseeInfo = document.querySelectorAll('.insee-info');
+        const inseeDisplay = document.querySelectorAll('.insee-display');
+        const inseeSiren = document.querySelectorAll('.insee-siren');
+
+        inseeInfo.forEach((b, i) => {
+            b.addEventListener('click', () => {
+                if (inseeDisplay[i].innerHTML === "") {
+                    b.disabled = true;
+                    b.innerHTML = "Patientez...";
+                    fetch('https://api.insee.fr/entreprises/sirene/V3/siren/' + inseeSiren[i].innerHTML, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'Authorization': 'Bearer 5529c9f2-3397-333f-b03b-9a4219f63ae1'
+                        }
+                    })
+                        .then(r => r.json())
+                        .then(d => {
+                            b.disabled = false;
+                            b.innerHTML = "Informations de l'INSEE";
+                            inseeDisplay[i].innerHTML = jsonHighlight(d);
+                        })
+                }
+            })
+        })
+    </script>
 
 {% endblock %}

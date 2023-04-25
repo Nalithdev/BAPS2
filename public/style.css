@@ -19,7 +19,6 @@ header {
 header .header-block {
     display: flex;
     align-items: center;
-    gap: 30px;
 }
 
 header img#logo {
@@ -55,26 +54,102 @@ header img#logo {
     padding: 2px;
 }
 
+.button.no-border::before {
+    display: none;
+}
+
 main.admin {
     padding: 20px;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
-main.admin .card {
+main.admin .manage  .card {
     padding: 20px 30px;
     background: white;
     border-radius: 10px;
     box-shadow: 0 10px 10px rgba(0,0,0,0.2);
-    width: fit-content;
+    display: grid;
+    grid-template-columns: 200px auto;
+    grid-template-rows: 1fr 3fr auto;
+    gap: 20px;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 1;
 }
 
-.card .info .name {
-    font-size: 1.5rem;
+.manage .card .illustration{
+    grid-row: 1 / 3;
+    aspect-ratio: 1/1;
+    width: 100%;
+    object-fit: cover;
+}
+.manage .card .head {
+    grid-column: 2/3;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.manage .card .info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.manage .card .siren-info {
+    display: grid;
+    grid-template-columns: 1fr 4fr;
+}
+
+.manage .card .insee-info {
+    height: fit-content;
+}
+
+.manage .card pre {
+    background: #F5F5F5;
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    overflow: auto;
+    max-height: 200px;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.manage .card .delete {
+    appearance: none;
+    border: none;
+    background-color: transparent;
+    color: rgba(226, 0, 0);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.manage .card pre span.json-key {
+    color: #FB3D03;
+}
+
+.manage .card pre span.json-number {
+    color: #17942a;
     font-weight: bold;
 }
 
+.manage .card pre span.json-string {
+    color: #3B434F;
+    font-style: italic;
+}
+
+.manage .card pre span.json-boolean {
+    color: #FF866A;
+    font-weight: bold;
+}
+
+.manage .card pre span.json-null {
+    color: darkred;
+}
 
 /* LOGIN PAGE */
 
