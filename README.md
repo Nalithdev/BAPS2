@@ -4,10 +4,11 @@
 README for Fid'Antony :
 
 
-1. Route without token.
+1. Routes without token.
 
 
-* /api/register:
+* /api/register: for registration 
+
 * for user 
 
    | POST | Champs |                          
@@ -18,6 +19,7 @@ README for Fid'Antony :
    |  | password |
    
 * for merchant
+
    | POST | Champs |                          
    |---|---|
    || firstname |
@@ -27,7 +29,7 @@ README for Fid'Antony :
    || siren |
 
 
-* /api/login:
+* /api/login: for connection
 
    | POST | Champs |
    |---|---|
@@ -37,7 +39,7 @@ README for Fid'Antony :
 * Route with token 
 
 
-* /api/message
+* /api/message : for consulting the newsfeed
 
    | POST | Fields |                          
    |---|---|
@@ -45,7 +47,7 @@ README for Fid'Antony :
    | String | description |
    | Int | user id |
   
-* /api/shop
+* /api/shop : 
    | POST | Fields |                          
    |---|---|
    | String | Name |
@@ -53,7 +55,7 @@ README for Fid'Antony :
    | String | Adresse |
    
 
-* /api/product
+* /api/product : for consulting a product
 
    | POST | Fields |
    |---|---|
@@ -62,19 +64,19 @@ README for Fid'Antony :
    | Int | Stock |
    | Float | Price |
    
-   * /api/product/{id}/modify
+   * /api/product/{id}/modify : for modifying a product
 
    | POST | Fields |                          
    |---|---|
    | Int | Stock |
   
-* /api/reserved/
+* /api/reserved/ : for reserving a product
    | POST | Fields |                          
    |---|---|
    | Int | Product_id |
    | Int | Quantity |
 
-* /api//shop/reservation/{id}/modify
+* /api//shop/reservation/{id}/modify : for modifying a reserved product
 
    | POST | Fields |                          
    |---|---|
@@ -82,19 +84,19 @@ README for Fid'Antony :
    | String | Status |
    | Int | Shop_id |
 
-* /api/point/{id}/add
+* /api/point/{id}/add : for adding points 
 
    | POST | Fields |                          
    |---|---|
    | Int | Point |
   
-* /api/point/{id}/remove
+* /api/point/{id}/remove : for deleting points
    | POST | Fields |                          
    |---|---|
    | Int | Point |
    
 
-* /api/user/modify
+* /api/user/modify : for modifying user informations
 
    | POST | Fields |
    |---|---|
@@ -102,14 +104,14 @@ README for Fid'Antony :
    | String | Firstname |
    | String | Lastname |
 
-* /api/user/MDPmodify
+* /api/user/MDPmodify : for modifying user password 
 
    | POST | Fields |                          
    |---|---|
    | String | Password |
 
   
-* /api/message
+* /api/message : for consulting feeds
    | GET |                          
    |---|
    | Response |
@@ -120,8 +122,8 @@ README for Fid'Antony :
             "id": ,
             "url": "/api/message/{id}"
         },
-* /api/message/{id}
 
+* /api/message/{id} : for consulting one feed
   | GET |                          
    |---|
    | Response |
@@ -139,7 +141,8 @@ README for Fid'Antony :
         "date": "2023-04-24 07:48:12"
       }
   }
-* /api/shop/{id}
+
+* /api/shop/{id} : for consulting a shop
   | Get |
   |---|
   | Response |
@@ -162,7 +165,8 @@ README for Fid'Antony :
          "adresse": "adresse du commerce"
      }
   }
-* /api/shops
+
+* /api/shops : for consulting all the shops
   | GET |
   |---|
   | Response |
@@ -179,3 +183,17 @@ README for Fid'Antony :
          }
      ]
   }
+
+* /auth1/{id} : for generating tokens
+  | GET |
+  |---|
+  | Response |
+  ```
+  {
+    "success": true,
+    "Token": $token,
+    "commerces": $id,
+    "role": $role[0],     ]
+  }
+
+
