@@ -569,22 +569,22 @@ class SecuredRouteController extends AbstractController
         if ($user){
 
 
-            if ($form['email'] == null){
-                $form['email'] = $user->getEmail();
+            if ($form['email'] != null){
+                $user->setEmail($form['email']);
 
             }
-            if ($form['lastname'] == null){
-                $form['lastname'] = $user->getLastname();
+            if ($form['lastname'] != null){
+                $user->setLastname($form['lastname']);
 
             }
-            if ($form['firstname'] == null){
-                $form['firstname'] = $user->getFirstname();
+            if ($form['firstname'] != null){
+                $user->setFirstname($form['firstname']);
 
             }
 
-            $user->setEmail($form['email']);
-            $user->setLastname($form['lastname']);
-            $user->setFirstname($form['firstname']);
+
+
+
             $managerRegistry->getManager()->persist($user);
             $managerRegistry->getManager()->flush();
 
