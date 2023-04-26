@@ -438,7 +438,7 @@ class SecuredRouteController extends AbstractController
     }
 
 
-    #[Route('/logout', name: 'disconect' , methods: ['GET'])]
+    #[Route('/logout', name: 'disconnect' , methods: ['GET'])]
     public function disconnect(Request $request, ManagerRegistry $managerRegistry, TokenRepository $tokenRepository): Response
     {
         $user = $this->user;
