@@ -191,9 +191,22 @@ README for Fid'Antony :
   ```
   {
     "success": true,
+    
     "Token": $token,
+    
     "commerces": $id,
-    "role": $role[0],     ]
+    
+    "role": $role[0],     
+  }
+
+* /users : for collect users informations
+  | GET |
+  |---|
+  | Response |
+  ```
+  {
+    "success": true,
+    "data": $data    
   }
 
 
