@@ -51,15 +51,6 @@ class AppController extends AbstractController
         }
         return $this->json(['success' => false, 'message' => 'Identifiants incorrects']);
     }
-    #[Route('/', name: 'app_index')]
-    public function index(): Response
-    {
-        return $this->render('app/index.html.twig', [
-            'controller_name' => 'AppController',
-        ]);
-
-
-    }
     #[Route('/register', name: 'app_register' , methods: ['POST'])]
     public function register(Request $request, ManagerRegistry $managerRegistry, UserPasswordHasherInterface $passwordHasher , UserRepository $userRepository): Response
     {
@@ -76,6 +67,7 @@ class AppController extends AbstractController
             $Nuser->setLastname($lastname);
             $Nuser->setEmail($email);
             $Nuser->setPassword($passwordHasher->hashPassword($Nuser, $password));
+            $Nuser->setLoyaltyPoints(0);
 
             if($email == $userRepository->findOneBy(['email' => $email])){
                 return new JsonResponse(['success' => false, 'message' => 'Cet email est déjà utilisé']);
@@ -86,7 +78,7 @@ class AppController extends AbstractController
                     $Nuser->setRoles(['ROLE_MERCHANT']);
                     $Nuser->setSiren($form['siren']);
                     $Nuser->setApproved(false);
-                    $Nuser->setLoyaltyPoints(0);
+
                 } else {
                     return new JsonResponse(['success' => false, 'message' => 'Vous devez renseigner un siren']);
                 }
