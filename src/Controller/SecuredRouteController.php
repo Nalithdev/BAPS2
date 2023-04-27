@@ -297,16 +297,21 @@ class SecuredRouteController extends AbstractController
 
 
     #[Route('/shop/{id}/reservations', name: 'reserved_get', methods: ['GET'])]
-    public function ReservedGet(Commerce $commerce, ManagerRegistry $managerRegistry): Response
+    public function ReservedGet($id , CommerceRepository $commerce, ReservationRepository  $reservationRepository, ManagerRegistry $managerRegistry): Response
 
     {
 
         $session = $this->user;
         if ($session->getRoles()[0] == 'ROLE_MERCHANT') {
-            $reservations = $commerce->getReservations();
+            $reservationRepository = $reservationRepository->findBy(['user' => $id]);
+
+
             $data = array();
 
-            foreach ($reservations as $r) {
+            foreach ($reservationRepository as $r) {
+
+                $product = $r->getProduct();
+                $reservations = $commerce->findOneBy(['id' => $product->getShop()]);
                 if ($r->getCdate() < new \DateTime("1day ago"))
                 {
                     $managerRegistry->getManager()->remove($r);
@@ -552,6 +557,7 @@ class SecuredRouteController extends AbstractController
                 'lastname' => $users->getLastname(),
                 'email' => $users->getEmail(),
                 'role' => $users->getRoles()[0],
+                'Approuved' => $users->getApproved(),
             ];
             return $this->json(['success' => true, 'user' => $data]);
         } else {

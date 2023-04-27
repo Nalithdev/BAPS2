@@ -170,7 +170,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function isApproved(): ?bool
+    public function getApproved(): ?bool
     {
         return $this->approved;
     }
