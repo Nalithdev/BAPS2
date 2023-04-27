@@ -3,6 +3,11 @@
 
 README for Fid'Antony :
 
+Initialize the project :
+
+```
+Composer install 
+```
 
 ## Routes without token.
 
