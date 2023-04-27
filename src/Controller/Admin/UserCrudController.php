@@ -12,6 +12,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
 class UserCrudController extends AbstractCrudController
@@ -43,5 +44,6 @@ class UserCrudController extends AbstractCrudController
             'Commerçant' => 'ROLE_MERCHANT',
         ])->setLabel('Rôle')->hideWhenCreating()->allowMultipleChoices();
         yield AssociationField::new('commerce')->setLabel('Commerce')->hideWhenCreating();
+        yield IntegerField::new('loyalty_points')->setLabel('Points de fidélité');
     }
 }
