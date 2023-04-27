@@ -184,10 +184,11 @@ README for Fid'Antony :
      ]
   }
 
-* /auth1/{id} : for generating tokens
+* /api/auth1/{id} : for generating tokens
   | GET |
   |---|
   | Response |
+  
   ```
   {
     "success": true,
@@ -199,7 +200,7 @@ README for Fid'Antony :
     "role": $role[0],     
   }
 
-* /users : for collect users informations
+* /api/users : for collect users informations
   | GET |
   |---|
   | Response |
@@ -208,5 +209,32 @@ README for Fid'Antony :
     "success": true,
     "data": $data    
   }
+*/api/reservation
+   | GET |
+   |---|
+   | Response |
+    ```
+   {
+       "success": true,
+      "message": "Voici vos réservations",
+      "reservation": []
+      }
+   
+   
 
-
+*/api/shop/{id}/reservations
+| GET |
+|---|
+| Response | 
+```
+{
+    "success": true,
+    "message": "Voici les réservations de vos clients",
+    "reservation": [
+        {
+            "id": 21,
+            "product": 32,
+            "quantity": 62,
+            "date": "2023-04-27T09:55:16+00:00"
+        },
+     }
