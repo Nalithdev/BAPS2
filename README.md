@@ -6,7 +6,7 @@ README for Fid'Antony :
 Initialize the project :
 
 ```
-Composer install 
+composer install 
 ```
 
 ## Routes without token.
