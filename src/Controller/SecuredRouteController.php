@@ -416,24 +416,15 @@ class SecuredRouteController extends AbstractController
     }
 
     #[Route('/point/{id}/add', name: 'point_add', methods: ['POST'])]
-    public function AddPoint($id , UserRepository $userRepository, ManagerRegistry $managerRegistry, Request $request): Response
+    public function AddPoint($id, UserRepository $userRepository, ManagerRegistry $managerRegistry, Request $request): Response
     {
         $session = $this->user;
         $points = $request->toArray();
-        $user = $userRepository->findOneBy(['id' => $id ]);
+        $user = $userRepository->findOneBy(['id' => $id]);
         $user->setLoyaltyPoints($user->getLoyaltyPoints() + $points['points']);
         $managerRegistry->getManager()->persist($user);
         $managerRegistry->getManager()->flush();
-
-        $data = [
-            'points de fidélité' => $user->getLoyaltyPoints(),
-        ];
-
-        return $this->json(['success' => true, 'message' => '', 'reservation' => $data]);
-
-
-
-
+        return $this->json(['success' => true,  'points' => $user->getLoyaltyPoints()]);
     }
 
     #[Route('/point/{id}/remove', name: 'point_delete', methods: ['POST'])]
@@ -449,9 +440,9 @@ class SecuredRouteController extends AbstractController
         $managerRegistry->getManager()->persist($user);
         $managerRegistry->getManager()->flush();
         $data = [
-            'points de fidélité' => $user->getLoyaltyPoints(),
+            'points' => $user->getLoyaltyPoints(),
         ];
-        return $this->json(['success' => true, 'amounts' => $data]);
+        return $this->json(['success' => true, 'points' => $user->getLoyaltyPoints()]);
 
     }
 
