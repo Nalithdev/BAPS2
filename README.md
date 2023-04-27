@@ -4,19 +4,20 @@
 README for Fid'Antony :
 
 
-1. Routes without token.
+## Routes without token.
 
+### Register
 
-* /api/register: for registration 
+`POST /api/register`
 
-* for user 
+* User : 
 
-   | POST | Champs |                          
+   | Type | Body |                          
    |---|---|
-   |  | firstname |
-   |  | lastname |
-   |  | email |
-   |  | password |
+   || firstname |
+   || lastname |
+   || email |
+   || password |
    
 * for merchant
 
@@ -115,7 +116,8 @@ README for Fid'Antony :
    | GET |                          
    |---|
    | Response |
-    ```{
+    ```json
+    {
      "success": true,
     "data": [
         {
@@ -238,3 +240,117 @@ README for Fid'Antony :
             "date": "2023-04-27T09:55:16+00:00"
         },
      }
+   ```
+*/api/getuser/{token}
+| GET |
+|---|
+| Response |
+```
+{
+    "success": true,
+    "message": "Envoie des réservations au client",
+    "user": {
+        "id": 8,
+        "firstname": "Philippe",
+        "lastname": "Lafont",
+        "email": "philippe.lafont@gmail.com"
+    }
+}
+```
+*/api/map
+| GET |
+|---|
+| Reponse |
+```json
+{
+    "success": true,
+    "adresse": [
+        {
+            "id": 2,
+            "address": "adresse du commerce"
+        }
+    ]
+}
+```
+
+*/api/categories
+| GET |
+|---|
+| Response |
+```json
+{
+    "success": true,
+    "message": "Vous pouvez consulter les catégories",
+    "0": [
+        {
+            "id": 31,
+            "name": "category 1",
+            "description": "description de la category 1",
+            "url": "/api/categories/31"
+        },
+
+```
+
+## Route
+
+| Méthode HTTP | URI              |
+|--------------|------------------|
+| GET          | /categories/{id} |
+
+## Paramètres 
+
+| Paramètre | Type   | Description                                      |
+|-----------|--------|--------------------------------------------------|
+| id        | string | L'identifiant de la catégorie à récupérer        |
+
+## Réponse HTTP
+
+### Succès
+
+| Status code | Description                                                                            |
+|-------------|----------------------------------------------------------------------------------------|
+| 200         | Renvoie les informations de la catégorie avec l'identifiant spécifié sous forme de JSON si l'utilisateur est un administrateur. |
+
+```json
+{
+    "success": true,
+    "message": "Vous pouvez consulter les catégories",
+    "categories": [
+        {
+            "id": 1,
+            "name": "Nourriture",
+            "description": "Catégorie pour les produits alimentaires."
+        }
+    ]
+}
+```
+
+| Méthode HTTP | URI           |
+|--------------|---------------|
+| GET          | /user/{id}    |
+
+## Paramètres 
+
+| Paramètre | Type   | Description                                      |
+|-----------|--------|--------------------------------------------------|
+| id        | string | L'identifiant de l'utilisateur à récupérer       |
+
+## Réponse HTTP
+
+### Succès
+
+| Status code | Description                                                                                                        |
+|-------------|--------------------------------------------------------------------------------------------------------------------|
+| 200         | Renvoie les informations de l'utilisateur avec l'identifiant spécifié sous forme de JSON si l'utilisateur est l'administrateur ou l'utilisateur lui-même. |
+
+```json
+{
+    "success": true,
+    "user": {
+        "id": 1,
+        "firstname": "John",
+        "lastname": "Doe",
+        "email": "johndoe@example.com",
+        "role": "ROLE_USER"
+    }
+}
