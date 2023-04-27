@@ -132,6 +132,7 @@ class SecuredRouteController extends AbstractController
             $shop->setAdresse($merchant['address']);
             $managerRegistry->getManager()->persist($shop);
             $user->setCommerce($shop);
+            $managerRegistry->getManager()->persist($user);
             $managerRegistry->getManager()->flush();
 
             return $this->json(['success' => true, 'message' => 'Votre page Commerce a bien été créer']);
