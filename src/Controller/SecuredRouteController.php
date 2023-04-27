@@ -119,7 +119,7 @@ class SecuredRouteController extends AbstractController
         return $this->json(['success' => true, 'data' => $data]);
     }
 
-    #[Route('/shop', name: 'app_DFeed', methods: ['POST'])]
+    #[Route('/shop', name: 'app_Cshop', methods: ['POST'])]
     public function CreateShop(Request $request, ManagerRegistry $managerRegistry): JsonResponse
     {
         $user = $this->user;
@@ -132,6 +132,7 @@ class SecuredRouteController extends AbstractController
             $shop->setAdresse($merchant['address']);
             $managerRegistry->getManager()->persist($shop);
             $user->setCommerce($shop);
+            $managerRegistry->getManager()->persist($user);
             $managerRegistry->getManager()->flush();
 
             return $this->json(['success' => true, 'message' => 'Votre page Commerce a bien été créer']);
@@ -410,12 +411,14 @@ class SecuredRouteController extends AbstractController
     }
 
     #[Route('/point/{id}/add', name: 'point_add', methods: ['POST'])]
-    public function AddPoint(UserRepository $userRepository, ManagerRegistry $managerRegistry, Request $request): Response
+    public function AddPoint($id , UserRepository $userRepository, ManagerRegistry $managerRegistry, Request $request): Response
     {
         $session = $this->user;
         $points = $request->toArray();
-        $user = $userRepository->findOneBy(['id' => $session->getId()]);
+        $user = $userRepository->findOneBy(['id' => $id ]);
         $user->setLoyaltyPoints($user->getLoyaltyPoints() + $points['points']);
+        $managerRegistry->getManager()->persist($user);
+        $managerRegistry->getManager()->flush();
 
         $data = [
             'points de fidélité' => $user->getLoyaltyPoints(),
@@ -634,7 +637,30 @@ class SecuredRouteController extends AbstractController
 
     }
 
+    #[Route('/user/modify/{id}/commerce', name: 'modify_commerce', methods: ['POST'])]
+    public function ModifyRole($id ,CommerceRepository $commerceRepository, ManagerRegistry $managerRegistry, Request $request): Response
+    {
 
+        $session = $this->user;
+        $commerce = $commerceRepository->findOneBy(array('id' => $id));
+        $form = $request->toArray();
+        if ($form['name'] != null) {
+            $commerce->setName($form['name']);
 
+        }
+        if ($form['description'] != null) {
+            $commerce->setDescription($form['description']);
+
+        }
+        if ($form['address'] != null) {
+            $commerce->setAdresse($form['address']);
+
+        }
+
+        $managerRegistry->getManager()->persist($commerce);
+        $managerRegistry->getManager()->flush();
+
+        return $this->json(['success' => true, 'message' => 'Vous avez modifié votre commerce']);
+    }
 
 }
