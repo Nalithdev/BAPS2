@@ -213,15 +213,15 @@ README for Fid'Antony :
    | GET |
    |---|
    | Response |
-    ```
+   ```
    {
-       "success": true,
+    "success": true,
       "message": "Voici vos réservations",
       "reservation": []
-      }
+   }
+   ```
    
    
-
 */api/shop/{id}/reservations
 | GET |
 |---|
