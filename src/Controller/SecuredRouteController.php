@@ -120,9 +120,14 @@ class SecuredRouteController extends AbstractController
     }
 
     #[Route('/shop', name: 'app_Cshop', methods: ['POST'])]
-    public function CreateShop(Request $request, ManagerRegistry $managerRegistry): JsonResponse
+    public function CreateShop(Request $request, ManagerRegistry $managerRegistry , UserRepository $userRepository): JsonResponse
     {
         $user = $this->user;
+        $commerce = $user->getCommerce();
+        if ($commerce != null) {
+            return $this->json(['success' => false, 'message' => 'Vous avez déjà une page commerce']);
+        }
+
         if ($user->getRoles()[0] == 'ROLE_MERCHANT') {
             $merchant = $request->toArray();
 
